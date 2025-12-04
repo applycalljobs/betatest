@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ApplyCall — One Call. All Jobs.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg"></div>
+    <main class="page">
+      <header class="brand">
+        <div class="logo">ApplyCall</div>
+        <div class="tag">One Call to Find and Apply for all Jobs</div>
+      </header>
+      <section class="card">
+        <h1 class="title">Be an early tester</h1>
+        <form id="interest-form" novalidate>
+          <div class="form-grid">
+            <div class="panel">
+              <p class="subtitle">Enter your phone number to trial the service.</p>
+              <div class="field-group">
+                <label for="phone" class="label">Phone number</label>
+                <div class="phone-row">
+                  <select id="country-code" name="countryCode" class="select" aria-label="Country code">
+                    <option value="+1">+1 (US)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+61">+61 (AU)</option>
+                    <option value="+91">+91 (IN)</option>
+                    <option value="+81">+81 (JP)</option>
+                    <option value="+49">+49 (DE)</option>
+                    <option value="+33">+33 (FR)</option>
+                    <option value="+971">+971 (AE)</option>
+                  </select>
+                  <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="555 123 4567" required />
+                </div>
+                <div class="error" id="phone-error"></div>
+              </div>
+              <button type="button" id="find" class="button">Find a Job</button>
+            </div>
+            <div class="panel">
+              <p class="subtitle">Add email to get updates and call results.</p>
+              <div class="field-group">
+                <label for="email" class="label">Email (optional)</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+                <div class="error" id="email-error"></div>
+              </div>
+              <button type="button" id="waitlist" class="button secondary">Join the Waitlist</button>
+            </div>
+          </div>
+          <div class="form-note" id="form-note"></div>
+        </form>
+      </section>
+      <footer class="footer">
+        <div>By joining, you agree to be contacted about ApplyCall testing.</div>
+      </footer>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
