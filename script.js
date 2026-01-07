@@ -236,17 +236,17 @@ async function loadProfileData() {
           
           div.innerHTML = `
             <div style="width:100%">
-              <div style="font-weight:600; font-size:15px; margin-bottom:4px;">
+              <div style="font-weight:700; font-size:16px; margin-bottom:4px; color: #fff;">
                 Job ${index + 1} - ${title}
               </div>
-              <div style="font-size:14px; color:var(--text); margin-bottom:4px;">
+              <div style="font-size:14px; color:var(--muted); margin-bottom:6px;">
                 ${company} ${location ? `• ${location}` : ''}
               </div>
-              <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
-                Status: <span style="font-weight:500; color:var(--primary)">${status}</span>
-                ${feedback ? `<br>Feedback: ${feedback}` : ''}
+              <div style="font-size:13px; margin-bottom:8px;">
+                <span style="color: var(--muted)">Status:</span> <span style="font-weight:600; color:var(--brand-2)">${status}</span>
+                ${feedback ? `<br><span style="color: var(--muted)">Feedback:</span> ${feedback}` : ''}
               </div>
-              <div style="font-size:11px; color:#aaa;">
+              <div style="font-size:11px; color: var(--muted); opacity: 0.7;">
                 Detected: ${new Date(app.date).toLocaleDateString()}
               </div>
             </div>
