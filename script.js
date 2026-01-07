@@ -88,14 +88,19 @@ function showProfile() {
   loadProfileData();
 }
 
-btnLoginNav.addEventListener('click', () => {
-  authModal.classList.remove('hidden');
-  stepPhone.classList.remove('hidden');
-  stepOtp.classList.add('hidden');
-  authError.textContent = '';
-  loginPhoneInput.value = '';
-  loginOtpInput.value = '';
-});
+if (btnLoginNav) {
+  btnLoginNav.addEventListener('click', () => {
+    console.log('Login button clicked');
+    if (authModal) {
+      authModal.classList.remove('hidden');
+      if (stepPhone) stepPhone.classList.remove('hidden');
+      if (stepOtp) stepOtp.classList.add('hidden');
+      if (authError) authError.textContent = '';
+      if (loginPhoneInput) loginPhoneInput.value = '';
+      if (loginOtpInput) loginOtpInput.value = '';
+    }
+  });
+}
 
 closeModal.addEventListener('click', () => {
   authModal.classList.add('hidden');
