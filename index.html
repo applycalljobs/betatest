@@ -11,50 +11,202 @@
   </head>
   <body>
     <div class="bg"></div>
+    <div id="auth-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 id="auth-title">Login</h2>
+        <div id="step-phone">
+          <p>Enter your phone number to access your profile.</p>
+          <div class="field-group">
+            <label for="login-phone" class="label">Phone number</label>
+            <input id="login-phone" type="tel" placeholder="+15551234567" />
+          </div>
+          <button id="btn-request-otp" class="button">Send Code</button>
+        </div>
+        <div id="step-otp" class="hidden">
+          <p>Enter the 6-digit code sent to your phone.</p>
+          <div class="field-group">
+            <label for="login-otp" class="label">Verification Code</label>
+            <input id="login-otp" type="text" placeholder="123456" maxlength="6" />
+          </div>
+          <button id="btn-verify-otp" class="button">Verify & Login</button>
+        </div>
+        <div id="auth-error" class="error"></div>
+      </div>
+    </div>
+
     <main class="page">
       <header class="brand">
-        <div class="logo">ApplyCall</div>
+        <div class="header-top">
+          <div class="logo">ApplyCall</div>
+          <button id="btn-login-nav" class="button secondary small">Login</button>
+          <button id="btn-logout-nav" class="button secondary small hidden">Logout</button>
+        </div>
         <div class="tag">One Call to Find and Apply for all Jobs</div>
       </header>
-      <div class="header-cta">Call (231) 515-4420 to find and apply or request a call back below</div>
-      <section class="card">
-        <h1 class="title">Be an early tester</h1>
-        <form id="interest-form" novalidate>
-          <div class="form-grid">
-            <div class="panel">
-              <p class="subtitle">Enter your phone number to trial the service.</p>
-              <div class="field-group">
-                <label for="phone" class="label">Phone number</label>
-                <div class="phone-row">
-                  <select id="country-code" name="countryCode" class="select" aria-label="Country code">
-                    <option value="+1">+1 (US)</option>
-                    <option value="+44">+44 (UK)</option>
-                    <option value="+61">+61 (AU)</option>
-                    <option value="+91">+91 (IN)</option>
-                    <option value="+81">+81 (JP)</option>
-                    <option value="+49">+49 (DE)</option>
-                    <option value="+33">+33 (FR)</option>
-                    <option value="+971">+971 (AE)</option>
-                  </select>
-                  <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="555 123 4567" required />
+
+      <!-- LANDING VIEW -->
+      <div id="landing-view">
+        <div class="header-cta">Call (231) 515-4420 to find and apply or request a call back below</div>
+        <section class="card">
+          <h1 class="title">Be an early tester</h1>
+          <form id="interest-form" novalidate>
+            <div class="form-grid">
+              <div class="panel">
+                <p class="subtitle">Enter your phone number to trial the service.</p>
+                <div class="field-group">
+                  <label for="phone" class="label">Phone number</label>
+                  <div class="phone-row">
+                    <select id="country-code" name="countryCode" class="select" aria-label="Country code">
+                      <option value="+1">+1 (US)</option>
+                      <option value="+44">+44 (UK)</option>
+                      <option value="+61">+61 (AU)</option>
+                      <option value="+91">+91 (IN)</option>
+                      <option value="+81">+81 (JP)</option>
+                      <option value="+49">+49 (DE)</option>
+                      <option value="+33">+33 (FR)</option>
+                      <option value="+971">+971 (AE)</option>
+                    </select>
+                    <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="555 123 4567" required />
+                  </div>
+                  <div class="error" id="phone-error"></div>
                 </div>
-                <div class="error" id="phone-error"></div>
+                <button type="button" id="find" class="button">Find a Job</button>
               </div>
-              <button type="button" id="find" class="button">Find a Job</button>
+              <div class="panel">
+                <p class="subtitle">Add email to get updates and call results.</p>
+                <div class="field-group">
+                  <label for="email" class="label">Email (optional)</label>
+                  <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+                  <div class="error" id="email-error"></div>
+                </div>
+                <button type="button" id="waitlist" class="button secondary">Join the Waitlist</button>
+              </div>
             </div>
+            <div class="form-note" id="form-note"></div>
+          </form>
+        </section>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div id="profile-view" class="hidden">
+        <section class="card profile-card">
+          <h1 class="title">My Profile</h1>
+          
+          <div class="profile-grid">
+            <div class="left-column-wrapper">
+            <!-- Personal Info -->
             <div class="panel">
-              <p class="subtitle">Add email to get updates and call results.</p>
+              <h3 class="panel-title">Personal Details</h3>
+              
               <div class="field-group">
-                <label for="email" class="label">Email (optional)</label>
-                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
-                <div class="error" id="email-error"></div>
+                <label class="label">Name</label>
+                <input id="p-name" type="text" placeholder="John Doe" />
               </div>
-              <button type="button" id="waitlist" class="button secondary">Join the Waitlist</button>
+
+              <div class="field-group">
+                <label class="label">Location</label>
+                <input id="p-location" type="text" placeholder="New York, NY" />
+              </div>
+
+              <div class="field-group">
+                <label class="label">Email/Contact</label>
+                <input id="p-email" type="email" placeholder="john@example.com" />
+              </div>
+
+              <div class="field-group">
+                <label class="label">Recent Role</label>
+                <input id="p-recent-role" type="text" placeholder="Software Engineer" />
+              </div>
+
+              <div id="btn-toggle-details" class="expand-trigger">
+                <span>Show More Details</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+
+              <div id="profile-extra-fields" class="hidden-fields">
+                <div class="field-group">
+                  <label class="label">Years Exp</label>
+                  <input id="p-years-exp" type="text" placeholder="5 years" />
+                </div>
+  
+                <div class="field-group">
+                  <label class="label">Motivation</label>
+                  <input id="p-motivation" type="text" placeholder="Pay, Career Change, Growth" />
+                </div>
+  
+                <div class="field-group">
+                  <label class="label">Min Pay</label>
+                  <input id="p-min-pay" type="text" placeholder="$80,000/yr" />
+                </div>
+  
+                <div class="field-group">
+                  <label class="label">Work Type</label>
+                  <input id="p-work-type" type="text" placeholder="FT, PT, Flex" />
+                </div>
+  
+                <div class="field-group">
+                  <label class="label">Weekly Schedule</label>
+                  <input id="p-weekly-schedule" type="text" placeholder="M-F, Weekends Only" />
+                </div>
+  
+                <div class="field-group">
+                  <label class="label">Availability Notes</label>
+                  <textarea id="p-availability-notes" class="input-area" rows="3" placeholder="Any specific constraints..."></textarea>
+                </div>
+              </div>
+
+              <button id="btn-save-profile" class="button">Save Changes</button>
+              <div id="profile-msg" class="form-note"></div>
+            </div>
+
+            <!-- Call Insights -->
+            <div class="panel">
+              <h3 class="panel-title">Latest Call Insights</h3>
+              <p class="subtitle">Summary from your last interaction with our AI agent.</p>
+              <div id="call-summary" class="info-box">No calls recorded yet.</div>
+            </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column-wrapper">
+              <!-- Applications -->
+              <div class="panel">
+                <h3 class="panel-title">My Applications</h3>
+                <div id="applications-list" class="app-list">
+                  <!-- JS will populate this -->
+                  <p class="hint">No applications yet.</p>
+                </div>
+              </div>
+
+              <!-- Recommended Jobs -->
+              <div class="panel">
+                <h3 class="panel-title">Recommended Jobs</h3>
+                <p class="subtitle" style="margin-bottom: 12px; font-size: 14px;">Jobs you might be a great fit for.</p>
+                <div id="recommended-jobs-list" class="app-list">
+                  <!-- JS will populate this -->
+                  <p class="hint">Loading recommendations...</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="form-note" id="form-note"></div>
-        </form>
-      </section>
+
+
+          <!-- CV Upload -->
+          <div class="panel full-width">
+            <h3 class="panel-title">Resume / CV</h3>
+            <p class="subtitle">Upload your latest resume to apply for jobs.</p>
+            <div class="field-group">
+              <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" />
+            </div>
+            <button id="btn-upload-cv" class="button secondary">Upload CV</button>
+            <div id="cv-msg" class="form-note"></div>
+            <div id="current-cv" class="hint"></div>
+          </div>
+
+        </section>
+      </div>
+
       <footer class="footer">
         <div>By joining, you agree to be contacted about ApplyCall testing.</div>
       </footer>
