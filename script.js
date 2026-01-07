@@ -24,3 +24,382 @@ codeSelect.addEventListener("change",updateState);
 findBtn.addEventListener("click",()=>handleAction("find"));
 waitlistBtn.addEventListener("click",()=>handleAction("waitlist"));
 updateState();
+
+const API_BASE = 'http://localhost:5000';
+
+const authModal = document.getElementById('auth-modal');
+const btnLoginNav = document.getElementById('btn-login-nav');
+const btnLogoutNav = document.getElementById('btn-logout-nav');
+const closeModal = document.querySelector('.close-modal');
+const btnRequestOtp = document.getElementById('btn-request-otp');
+const btnVerifyOtp = document.getElementById('btn-verify-otp');
+const stepPhone = document.getElementById('step-phone');
+const stepOtp = document.getElementById('step-otp');
+const authError = document.getElementById('auth-error');
+const landingView = document.getElementById('landing-view');
+const profileView = document.getElementById('profile-view');
+
+const loginPhoneInput = document.getElementById('login-phone');
+const loginOtpInput = document.getElementById('login-otp');
+
+const pName = document.getElementById('p-name');
+const pEmail = document.getElementById('p-email');
+const pLocation = document.getElementById('p-location');
+const pRecentRole = document.getElementById('p-recent-role');
+const pYearsExp = document.getElementById('p-years-exp');
+const pMotivation = document.getElementById('p-motivation');
+const pMinPay = document.getElementById('p-min-pay');
+const pWorkType = document.getElementById('p-work-type');
+const pWeeklySchedule = document.getElementById('p-weekly-schedule');
+const pAvailabilityNotes = document.getElementById('p-availability-notes');
+const btnSaveProfile = document.getElementById('btn-save-profile');
+const profileMsg = document.getElementById('profile-msg');
+const callSummary = document.getElementById('call-summary');
+const appList = document.getElementById('applications-list');
+const recJobsList = document.getElementById('recommended-jobs-list');
+
+const cvUpload = document.getElementById('cv-upload');
+const btnUploadCv = document.getElementById('btn-upload-cv');
+const cvMsg = document.getElementById('cv-msg');
+const currentCv = document.getElementById('current-cv');
+
+let authToken = localStorage.getItem('applycall_token');
+
+function init() {
+  if (authToken) {
+    showProfile();
+  } else {
+    showLanding();
+  }
+}
+
+function showLanding() {
+  landingView.classList.remove('hidden');
+  profileView.classList.add('hidden');
+  btnLoginNav.classList.remove('hidden');
+  btnLogoutNav.classList.add('hidden');
+}
+
+function showProfile() {
+  landingView.classList.add('hidden');
+  profileView.classList.remove('hidden');
+  btnLoginNav.classList.add('hidden');
+  btnLogoutNav.classList.remove('hidden');
+  loadProfileData();
+}
+
+btnLoginNav.addEventListener('click', () => {
+  authModal.classList.remove('hidden');
+  stepPhone.classList.remove('hidden');
+  stepOtp.classList.add('hidden');
+  authError.textContent = '';
+  loginPhoneInput.value = '';
+  loginOtpInput.value = '';
+});
+
+closeModal.addEventListener('click', () => {
+  authModal.classList.add('hidden');
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target === authModal) {
+    authModal.classList.add('hidden');
+  }
+});
+
+btnLogoutNav.addEventListener('click', () => {
+  authToken = null;
+  localStorage.removeItem('applycall_token');
+  showLanding();
+});
+
+
+btnRequestOtp.addEventListener('click', async () => {
+  const phone = loginPhoneInput.value.trim();
+  if (!phone) {
+    authError.textContent = 'Please enter a phone number.';
+    return;
+  }
+  
+  btnRequestOtp.disabled = true;
+  btnRequestOtp.textContent = 'Sending...';
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      stepPhone.classList.add('hidden');
+      stepOtp.classList.remove('hidden');
+      authError.textContent = '';
+    } else {
+      authError.textContent = data.error || 'Failed to send code.';
+    }
+  } catch (err) {
+    authError.textContent = 'Network error. Check console.';
+    console.error(err);
+  } finally {
+    btnRequestOtp.disabled = false;
+    btnRequestOtp.textContent = 'Send Code';
+  }
+});
+
+btnVerifyOtp.addEventListener('click', async () => {
+  const phone = loginPhoneInput.value.trim();
+  const code = loginOtpInput.value.trim();
+  
+  if (!code) {
+    authError.textContent = 'Enter the code.';
+    return;
+  }
+
+  btnVerifyOtp.disabled = true;
+  btnVerifyOtp.textContent = 'Verifying...';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, code })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      authToken = data.token; // In this mock, token is just the phone number
+      localStorage.setItem('applycall_token', authToken);
+      authModal.classList.add('hidden');
+      showProfile();
+    } else {
+      authError.textContent = data.error || 'Invalid code.';
+    }
+  } catch (err) {
+    authError.textContent = 'Error verifying code.';
+    console.error(err);
+  } finally {
+    btnVerifyOtp.disabled = false;
+    btnVerifyOtp.textContent = 'Verify & Login';
+  }
+});
+
+async function loadProfileData() {
+  if (!authToken) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/profile`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      const p = data.profile;
+      pName.value = p.name || '';
+      pEmail.value = p.email || '';
+      pLocation.value = p.location || '';
+      pRecentRole.value = p.recent_role || '';
+      pYearsExp.value = p.years_experience || '';
+      pMotivation.value = p.motivation || '';
+      pMinPay.value = p.min_pay || '';
+      pWorkType.value = p.work_type || '';
+      pWeeklySchedule.value = p.weekly_schedule || '';
+      pAvailabilityNotes.value = p.availability_notes || '';
+      
+      if (p.cv_filename) {
+        currentCv.textContent = `Current CV: ${p.cv_filename}`;
+      } else {
+        currentCv.textContent = '';
+      }
+
+      callSummary.textContent = p.call_summary || 'No call data available yet.';
+
+      appList.innerHTML = '';
+      if (p.applications && p.applications.length > 0) {
+        p.applications.forEach((app, index) => {
+          const div = document.createElement('div');
+          div.className = 'app-item';
+          
+          // Format as requested: Job X - Title, Company, Location...
+          // We'll use a clean layout but include all details.
+          const title = app.title || 'Unknown Role';
+          const company = app.company || 'Unknown Company';
+          const location = app.location || '';
+          const status = app.status || 'Unknown Status';
+          const feedback = app.feedback || '';
+          
+          div.innerHTML = `
+            <div style="width:100%">
+              <div style="font-weight:600; font-size:15px; margin-bottom:4px;">
+                Job ${index + 1} - ${title}
+              </div>
+              <div style="font-size:14px; color:var(--text); margin-bottom:4px;">
+                ${company} ${location ? `• ${location}` : ''}
+              </div>
+              <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
+                Status: <span style="font-weight:500; color:var(--primary)">${status}</span>
+                ${feedback ? `<br>Feedback: ${feedback}` : ''}
+              </div>
+              <div style="font-size:11px; color:#aaa;">
+                Detected: ${new Date(app.date).toLocaleDateString()}
+              </div>
+            </div>
+          `;
+          appList.appendChild(div);
+        });
+      } else {
+        appList.innerHTML = '<p class="hint">No applications found.</p>';
+      }
+
+      // Recommended Jobs
+      if (recJobsList) {
+        recJobsList.innerHTML = '';
+        if (p.recommended_jobs && p.recommended_jobs.length > 0) {
+          p.recommended_jobs.forEach(job => {
+            const div = document.createElement('div');
+            div.className = 'rec-job-item';
+            
+            div.innerHTML = `
+              <div class="rec-job-header">
+                <div>
+                  <div class="rec-job-title">${job.title}</div>
+                  <div class="rec-job-company">${job.company}</div>
+                </div>
+                <div class="rec-job-match">${job.match_score}% Match</div>
+              </div>
+              
+              <div class="rec-job-details">
+                <div class="rec-job-detail-item">📍 ${job.location}</div>
+                <div class="rec-job-detail-item">💰 ${job.pay}</div>
+              </div>
+
+              <div class="rec-job-actions">
+                <button class="button small" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
+                <button class="button secondary small" onclick="alert('Initiating call application for ${job.title}...')">Apply via Phone</button>
+              </div>
+            `;
+            recJobsList.appendChild(div);
+          });
+        } else {
+          recJobsList.innerHTML = '<p class="hint">No recommendations available.</p>';
+        }
+      }
+
+    } else {
+      if (res.status === 401) {
+        authToken = null;
+        localStorage.removeItem('applycall_token');
+        showLanding();
+      }
+    }
+  } catch (err) {
+    console.error('Error loading profile:', err);
+  }
+}
+
+btnSaveProfile.addEventListener('click', async () => {
+  if (!authToken) return;
+  
+  btnSaveProfile.disabled = true;
+  btnSaveProfile.textContent = 'Saving...';
+  profileMsg.textContent = '';
+
+  const updates = {
+    name: pName.value,
+    email: pEmail.value,
+    location: pLocation.value,
+    recent_role: pRecentRole.value,
+    years_experience: pYearsExp.value,
+    motivation: pMotivation.value,
+    min_pay: pMinPay.value,
+    work_type: pWorkType.value,
+    weekly_schedule: pWeeklySchedule.value,
+    availability_notes: pAvailabilityNotes.value
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/api/profile`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    });
+    const data = await res.json();
+    if (data.success) {
+      profileMsg.textContent = 'Profile updated successfully.';
+      profileMsg.style.color = 'var(--success)';
+    } else {
+      profileMsg.textContent = 'Update failed.';
+      profileMsg.style.color = 'var(--error)';
+    }
+  } catch (err) {
+    profileMsg.textContent = 'Error saving profile.';
+    profileMsg.style.color = 'var(--error)';
+  } finally {
+    btnSaveProfile.disabled = false;
+    btnSaveProfile.textContent = 'Save Changes';
+  }
+});
+
+btnUploadCv.addEventListener('click', async () => {
+  if (!authToken) return;
+  
+  const file = cvUpload.files[0];
+  if (!file) {
+    cvMsg.textContent = 'Please select a file.';
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  btnUploadCv.disabled = true;
+  btnUploadCv.textContent = 'Uploading...';
+  cvMsg.textContent = '';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/upload-cv`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${authToken}` },
+      body: formData
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      cvMsg.textContent = 'CV uploaded!';
+      cvMsg.style.color = 'var(--success)';
+      currentCv.textContent = `Current CV: ${data.filename}`;
+      cvUpload.value = '';
+    } else {
+      cvMsg.textContent = data.error || 'Upload failed.';
+      cvMsg.style.color = 'var(--error)';
+    }
+  } catch (err) {
+    cvMsg.textContent = 'Error uploading file.';
+    cvMsg.style.color = 'var(--error)';
+  } finally {
+    btnUploadCv.disabled = false;
+    btnUploadCv.textContent = 'Upload CV';
+  }
+});
+
+const btnToggleDetails = document.getElementById('btn-toggle-details');
+const profileExtraFields = document.getElementById('profile-extra-fields');
+
+if (btnToggleDetails && profileExtraFields) {
+  btnToggleDetails.addEventListener('click', () => {
+    const isExpanded = profileExtraFields.classList.toggle('expanded');
+    btnToggleDetails.classList.toggle('expanded');
+    
+    // Update text
+    const span = btnToggleDetails.querySelector('span');
+    if (span) {
+      span.textContent = isExpanded ? 'Show Less Details' : 'Show More Details';
+    }
+  });
+}
+
+init();
