@@ -2,265 +2,94 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>ApplyCall — One Call. All Jobs.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-:root{--bg-0:#08080d;--bg-1:#0e0f17;--fg:#e9eef7;--muted:#a9b0be;--brand-1:#6e78ff;--brand-2:#4cc9f0;--accent:#f8b4d9;--success:#86efac;--error:#fca5a5}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:linear-gradient(120deg,var(--bg-0),var(--bg-1));color:var(--fg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-.bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(1200px 500px at 20% 10%,rgba(78,201,240,.22),transparent),radial-gradient(900px 400px at 80% 30%,rgba(110,120,255,.25),transparent),radial-gradient(700px 300px at 50% 90%,rgba(248,180,217,.18),transparent)}
-.bg::before,.bg::after{content:"";position:absolute;border-radius:50%;filter:blur(60px);opacity:.35}
-.bg::before{width:900px;height:900px;left:-200px;top:-160px;background:radial-gradient(closest-side,rgba(110,120,255,.35),transparent);animation:orbit1 12s ease-in-out infinite alternate}
-.bg::after{width:800px;height:800px;right:-160px;bottom:-120px;background:radial-gradient(closest-side,rgba(76,201,240,.35),transparent);animation:orbit2 14s ease-in-out infinite alternate}
-.page{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;gap:24px;align-items:center;justify-items:center;padding:48px 24px}
-.brand{text-align:center;width: 100%; max-width: 980px;}
-.logo{font-weight:700;font-size:36px;letter-spacing:.6px;background:linear-gradient(90deg,var(--brand-1),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 8px 30px rgba(110,120,255,.35)}
-.tag{margin-top:8px;color:var(--muted);font-size:14px}
-.header-cta{margin-top:12px;text-align:center;font-size:18px;font-weight:600;color:var(--fg)}
-.card{width:100%;max-width:980px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:34px;backdrop-filter:saturate(180%) blur(22px);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(110,120,255,.18),0 0 50px rgba(76,201,240,.12)}
-.title{margin:0 0 8px;font-size:24px;font-weight:600}
-.subtitle{margin:0 0 20px;color:#cbd2e0;font-size:16px;line-height:1.6}
-form{display:grid;gap:16px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-.panel{display:grid;gap:16px;align-content:start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:16px}
-.field-group{display:grid;gap:8px}
-.label{font-size:13px;color:var(--muted)}
-.phone-row{display:grid;grid-template-columns:160px 1fr;gap:10px}
-.select{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(8,10,20,.6);color:var(--fg);outline:none;appearance:none}
-.select:focus{border-color:var(--brand-2);box-shadow:0 0 0 4px rgba(76,201,240,.15)}
-input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(8,10,20,.6);color:var(--fg);outline:none;transition:border-color .18s,box-shadow .18s,transform .08s}
-input::placeholder{color:#7c8191}
-input:focus{border-color:var(--brand-2);box-shadow:0 0 0 5px rgba(76,201,240,.18);transform:translateZ(0)}
-.error{min-height:18px;color:var(--error);font-size:12px}
-.hint{margin-top:4px;color:var(--muted);font-size:13px}
-.buttons{display:flex;gap:12px;flex-wrap:wrap}
-.button{padding:14px 18px;border-radius:12px;border:0;background:linear-gradient(100deg,var(--brand-1),var(--brand-2));color:white;font-weight:700;cursor:pointer;transition:transform .08s ease,filter .2s,box-shadow .2s,background-position .3s;background-size:200%}
-.button.secondary{background:transparent;border:1px solid rgba(255,255,255,.28);color:var(--fg)}
-.button:hover{filter:brightness(1.1);box-shadow:0 10px 30px rgba(110,120,255,.28),0 8px 24px rgba(76,201,240,.18);background-position:80%}
-.button:active{transform:scale(.99)}
-.button[disabled]{opacity:.6;cursor:not-allowed}
-.form-note{min-height:20px;color:var(--muted);font-size:13px}
-.footer{color:#7c8191;font-size:12px;text-align:center}
-@media (max-width:768px){.form-grid{grid-template-columns:1fr}.panel{padding:14px}}
-@media (max-width:480px){.card{padding:22px}.title{font-size:22px}.subtitle{font-size:14px}.phone-row{grid-template-columns:120px 1fr}}
-
-@keyframes orbit1{0%{transform:translate(0,0)}100%{transform:translate(40px,30px)}}
-@keyframes orbit2{0%{transform:translate(0,0)}100%{transform:translate(-30px,-40px)}}
-
-.hidden { display: none !important; }
-.small { padding: 8px 16px; font-size: 14px; }
-.header-top { display: flex; align-items: center; justify-content: center; gap: 20px; position: relative; }
-.header-top .button { position: absolute; right: 0; top: 0; z-index: 10; }
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-content { background: #161821; border: 1px solid rgba(255,255,255,0.14); border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-.close-modal { position: absolute; right: 20px; top: 15px; font-size: 28px; color: var(--muted); cursor: pointer; transition: color 0.2s; }
-.close-modal:hover { color: var(--fg); }
-.profile-card { max-width: 1200px; }
-.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-.full-width { grid-column: 1 / -1; }
-.input-area { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.22); background: rgba(8,10,20,0.6); color: var(--fg); outline: none; font-family: inherit; resize: vertical; color: var(--fg); }
-.input-area:focus { border-color: var(--brand-2); box-shadow: 0 0 0 4px rgba(76,201,240,0.15); }
-.panel-title { margin: 0 0 16px; font-size: 18px; font-weight: 600; color: var(--brand-2); }
-.info-box { background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); white-space: pre-wrap; line-height: 1.6; }
-.app-list { display: grid; gap: 12px; }
-.app-item { background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-.app-status { font-size: 13px; padding: 4px 10px; border-radius: 20px; background: rgba(110,120,255,0.2); color: #a5b4fc; }
-
-@media (max-width: 768px) {
-  .profile-grid { grid-template-columns: 1fr; }
-  .header-top { flex-direction: column; gap: 10px; }
-  .header-top .button { position: static; }
-}
-
-/* Expandable Section */
-.expand-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--brand-2);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 8px 0;
-  user-select: none;
-  transition: opacity 0.2s;
-}
-.expand-trigger:hover {
-  opacity: 0.8;
-}
-.expand-trigger svg {
-  transition: transform 0.3s;
-}
-.expand-trigger.expanded svg {
-  transform: rotate(180deg);
-}
-
-.hidden-fields {
-  display: grid;
-  gap: 16px;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
-}
-.hidden-fields.expanded {
-  max-height: 1000px;
-  opacity: 1;
-  margin-top: 8px;
-}
-
-/* Right Column Wrapper */
-.right-column-wrapper,
-.left-column-wrapper {
-  display: grid;
-  gap: 24px;
-  align-content: start;
-}
-
-/* Recommended Job Item */
-.rec-job-item {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: border-color 0.2s;
-}
-.rec-job-item:hover {
-  border-color: rgba(110, 120, 255, 0.3);
-}
-
-.rec-job-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.rec-job-title {
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--fg);
-  margin-bottom: 4px;
-}
-.rec-job-company {
-  font-size: 13px;
-  color: var(--muted);
-}
-.rec-job-details {
-  display: flex;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-.rec-job-detail-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.rec-job-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-.rec-job-actions .button {
-  padding: 8px 12px;
-  font-size: 12px;
-  flex: 1;
-  text-align: center;
-}
-.rec-job-match {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--success);
-  background: rgba(134, 239, 172, 0.1);
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <div class="bg"></div>
+    
+    <!-- Auth Modal -->
     <div id="auth-modal" class="modal hidden">
       <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <h2 id="auth-title">Login</h2>
+        <h2 class="title" style="font-size: 24px;">Login</h2>
         <div id="step-phone">
-          <p>Enter your phone number to access your profile.</p>
+          <p class="subtitle">Enter your phone number to access your profile.</p>
           <div class="field-group">
             <label for="login-phone" class="label">Phone number</label>
             <input id="login-phone" type="tel" placeholder="+15551234567" />
           </div>
-          <button id="btn-request-otp" class="button">Send Code</button>
+          <button id="btn-request-otp" class="button" style="margin-top: 16px;">Send Code</button>
         </div>
         <div id="step-otp" class="hidden">
-          <p>Enter the 6-digit code sent to your phone.</p>
+          <p class="subtitle">Enter the 6-digit code sent to your phone.</p>
           <div class="field-group">
             <label for="login-otp" class="label">Verification Code</label>
             <input id="login-otp" type="text" placeholder="123456" maxlength="6" />
           </div>
-          <button id="btn-verify-otp" class="button">Verify & Login</button>
+          <button id="btn-verify-otp" class="button" style="margin-top: 16px;">Verify & Login</button>
         </div>
         <div id="auth-error" class="error"></div>
       </div>
     </div>
 
     <main class="page">
-      <header class="brand">
-        <div class="header-top">
-          <div class="logo">ApplyCall</div>
+      <header class="header-top">
+        <div class="logo">ApplyCall</div>
+        <div style="display: flex; gap: 8px;">
           <button id="btn-login-nav" class="button secondary small">Login</button>
           <button id="btn-logout-nav" class="button secondary small hidden">Logout</button>
         </div>
-        <div class="tag">One Call to Find and Apply for all Jobs</div>
       </header>
 
       <!-- LANDING VIEW -->
       <div id="landing-view">
-        <div class="header-cta">Call (231) 515-4420 to find and apply or request a call back below</div>
+        <div style="text-align: center; padding: 20px 0;">
+          <h1 class="title" style="font-size: 40px; line-height: 1.1;">Find your next job with one call.</h1>
+          <div class="header-cta" style="margin-top: 20px; color: var(--brand-2);">
+            Call (231) 515-4420
+          </div>
+          <p class="subtitle" style="margin-top: 8px;">or let us call you.</p>
+        </div>
+
         <section class="card">
-          <h1 class="title">Be an early tester</h1>
           <form id="interest-form" novalidate>
-            <div class="form-grid">
-              <div class="panel">
-                <p class="subtitle">Enter your phone number to trial the service.</p>
-                <div class="field-group">
-                  <label for="phone" class="label">Phone number</label>
-                  <div class="phone-row">
-                    <select id="country-code" name="countryCode" class="select" aria-label="Country code">
-                      <option value="+1">+1 (US)</option>
-                      <option value="+44">+44 (UK)</option>
-                      <option value="+61">+61 (AU)</option>
-                      <option value="+91">+91 (IN)</option>
-                      <option value="+81">+81 (JP)</option>
-                      <option value="+49">+49 (DE)</option>
-                      <option value="+33">+33 (FR)</option>
-                      <option value="+971">+971 (AE)</option>
-                    </select>
-                    <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="555 123 4567" required />
-                  </div>
-                  <div class="error" id="phone-error"></div>
+            <div class="panel">
+              <h3 class="panel-title">Start Your Search</h3>
+              <div class="field-group">
+                <label for="phone" class="label">Phone number</label>
+                <div class="phone-row">
+                  <select id="country-code" name="countryCode" class="select" style="width: 110px;">
+                    <option value="+1">+1 US</option>
+                    <option value="+44">+44 UK</option>
+                    <option value="+61">+61 AU</option>
+                    <option value="+91">+91 IN</option>
+                    <option value="+81">+81 JP</option>
+                    <option value="+49">+49 DE</option>
+                    <option value="+33">+33 FR</option>
+                    <option value="+971">+971 AE</option>
+                  </select>
+                  <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="555 123 4567" required />
                 </div>
-                <button type="button" id="find" class="button">Find a Job</button>
+                <div class="error" id="phone-error"></div>
               </div>
-              <div class="panel">
-                <p class="subtitle">Add email to get updates and call results.</p>
-                <div class="field-group">
-                  <label for="email" class="label">Email (optional)</label>
-                  <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
-                  <div class="error" id="email-error"></div>
-                </div>
-                <button type="button" id="waitlist" class="button secondary">Join the Waitlist</button>
-              </div>
+              <button type="button" id="find" class="button" style="margin-top: 12px;">Find a Job</button>
             </div>
+
+            <div class="panel">
+              <h3 class="panel-title">Join Waitlist</h3>
+              <div class="field-group">
+                <label for="email" class="label">Email (optional)</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+                <div class="error" id="email-error"></div>
+              </div>
+              <button type="button" id="waitlist" class="button secondary" style="margin-top: 12px;">Join the Waitlist</button>
+            </div>
+            
             <div class="form-note" id="form-note"></div>
           </form>
         </section>
@@ -268,14 +97,57 @@ input:focus{border-color:var(--brand-2);box-shadow:0 0 0 5px rgba(76,201,240,.18
 
       <!-- PROFILE VIEW -->
       <div id="profile-view" class="hidden">
-        <section class="card profile-card">
-          <h1 class="title">My Profile</h1>
+        <section class="profile-card">
           
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <div class="profile-avatar-img">👤</div>
+            </div>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Applied</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Matches</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Views</div>
+              </div>
+            </div>
+          </div>
+
           <div class="profile-grid">
-            <div class="left-column-wrapper">
+            
+            <!-- Applications (Moved to Top) -->
+            <div class="panel">
+              <h3 class="panel-title">
+                <span>🚀</span> My Applications
+              </h3>
+              <div id="applications-list" class="app-list">
+                <!-- JS will populate this -->
+                <p class="form-note">No applications yet.</p>
+              </div>
+            </div>
+
+            <!-- Recommended Jobs -->
+            <div class="panel" style="background: transparent; border: none; padding: 0;">
+              <h3 class="panel-title" style="padding-left: 4px;">
+                <span>🔥</span> Recommended Jobs
+              </h3>
+              <div id="recommended-jobs-list" class="app-list" style="gap: 20px;">
+                <!-- JS will populate this -->
+                <p class="form-note">Loading recommendations...</p>
+              </div>
+            </div>
+
             <!-- Personal Info -->
             <div class="panel">
-              <h3 class="panel-title">Personal Details</h3>
+              <h3 class="panel-title">
+                <span>📝</span> Personal Details
+              </h3>
               
               <div class="field-group">
                 <label class="label">Name</label>
@@ -334,58 +206,36 @@ input:focus{border-color:var(--brand-2);box-shadow:0 0 0 5px rgba(76,201,240,.18
                 </div>
               </div>
 
-              <button id="btn-save-profile" class="button">Save Changes</button>
+              <button id="btn-save-profile" class="button" style="margin-top: 16px;">Save Changes</button>
               <div id="profile-msg" class="form-note"></div>
             </div>
 
             <!-- Call Insights -->
             <div class="panel">
-              <h3 class="panel-title">Latest Call Insights</h3>
-              <p class="subtitle">Summary from your last interaction with our AI agent.</p>
-              <div id="call-summary" class="info-box">No calls recorded yet.</div>
-            </div>
+              <h3 class="panel-title">
+                <span>📞</span> Latest Call Insights
+              </h3>
+              <div id="call-summary" class="info-box" style="font-size: 14px; color: #ddd;">No calls recorded yet.</div>
             </div>
 
-            <!-- Right Column -->
-            <div class="right-column-wrapper">
-              <!-- Applications -->
-              <div class="panel">
-                <h3 class="panel-title">My Applications</h3>
-                <div id="applications-list" class="app-list">
-                  <!-- JS will populate this -->
-                  <p class="hint">No applications yet.</p>
-                </div>
+            <!-- CV Upload -->
+            <div class="panel">
+              <h3 class="panel-title">
+                <span>📄</span> Resume / CV
+              </h3>
+              <div class="field-group">
+                <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" style="padding: 12px; font-size: 14px;" />
               </div>
-
-              <!-- Recommended Jobs -->
-              <div class="panel">
-                <h3 class="panel-title">Recommended Jobs</h3>
-                <p class="subtitle" style="margin-bottom: 12px; font-size: 14px;">Jobs you might be a great fit for.</p>
-                <div id="recommended-jobs-list" class="app-list">
-                  <!-- JS will populate this -->
-                  <p class="hint">Loading recommendations...</p>
-                </div>
-              </div>
+              <button id="btn-upload-cv" class="button secondary" style="margin-top: 12px;">Upload CV</button>
+              <div id="cv-msg" class="form-note"></div>
+              <div id="current-cv" class="form-note" style="margin-top: 8px;"></div>
             </div>
+
           </div>
-
-
-          <!-- CV Upload -->
-          <div class="panel full-width">
-            <h3 class="panel-title">Resume / CV</h3>
-            <p class="subtitle">Upload your latest resume to apply for jobs.</p>
-            <div class="field-group">
-              <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" />
-            </div>
-            <button id="btn-upload-cv" class="button secondary">Upload CV</button>
-            <div id="cv-msg" class="form-note"></div>
-            <div id="current-cv" class="hint"></div>
-          </div>
-
         </section>
       </div>
 
-      <footer class="footer">
+      <footer class="footer" style="padding: 20px; margin-top: auto;">
         <div>By joining, you agree to be contacted about ApplyCall testing.</div>
       </footer>
     </main>
