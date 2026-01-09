@@ -25,7 +25,9 @@ findBtn.addEventListener("click",()=>handleAction("find"));
 waitlistBtn.addEventListener("click",()=>handleAction("waitlist"));
 updateState();
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:5000' 
+    : 'https://basic.applycall.jobs';
 
 const authModal = document.getElementById('auth-modal');
 const btnLoginNav = document.getElementById('btn-login-nav');
