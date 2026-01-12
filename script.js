@@ -25,9 +25,7 @@ findBtn.addEventListener("click",()=>handleAction("find"));
 waitlistBtn.addEventListener("click",()=>handleAction("waitlist"));
 updateState();
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:5000' 
-    : 'https://basic.applycall.jobs';
+const API_BASE = 'https://basic.applycall.jobs';
 
 const authModal = document.getElementById('auth-modal');
 const btnLoginNav = document.getElementById('btn-login-nav');
@@ -263,9 +261,12 @@ async function loadProfileData() {
       if (recJobsList) {
         recJobsList.innerHTML = '';
         if (p.recommended_jobs && p.recommended_jobs.length > 0) {
-          p.recommended_jobs.forEach(job => {
+          p.recommended_jobs.forEach((job, idx) => {
             const div = document.createElement('div');
             div.className = 'rec-job-item';
+            
+            // Create unique ID for toggle
+            const toggleId = `job-desc-${idx}`;
             
             div.innerHTML = `
               <div class="rec-job-header">
@@ -278,12 +279,22 @@ async function loadProfileData() {
               
               <div class="rec-job-details">
                 <div class="rec-job-detail-item">📍 ${job.location}</div>
-                <div class="rec-job-detail-item">💰 ${job.pay}</div>
               </div>
 
-              <div class="rec-job-actions">
-                <button class="button small" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
-                <button class="button secondary small" onclick="alert('Initiating call application for ${job.title}...')">Apply via Phone</button>
+              <div class="rec-job-expand" onclick="document.getElementById('${toggleId}').classList.toggle('hidden'); this.querySelector('span').textContent = document.getElementById('${toggleId}').classList.contains('hidden') ? '▼' : '▲';" style="text-align: center; cursor: pointer; padding: 8px; color: var(--brand-2); margin-top: 4px;">
+                <span style="font-size: 18px;">▼</span>
+              </div>
+
+              <div id="${toggleId}" class="rec-job-extra hidden" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+                <div style="font-size: 13px; color: #ddd; margin-bottom: 12px; line-height: 1.5;">
+                   ${job.match_justification ? `<div style="background: rgba(46, 204, 113, 0.1); padding: 8px; border-radius: 4px; margin-bottom: 8px; border-left: 2px solid var(--brand-2);"><strong>Why you fit:</strong> ${job.match_justification}</div>` : ''}
+                   <p>${job.description || 'No description available.'}</p>
+                   <p style="margin-top: 8px; color: var(--text);">💰 <strong>Pay:</strong> ${job.pay}</p>
+                </div>
+                <div class="rec-job-actions">
+                  <button class="button small" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
+                  <button class="button secondary small" onclick="alert('Initiating call application for ${job.title}...')">Apply via Phone</button>
+                </div>
               </div>
             `;
             recJobsList.appendChild(div);
