@@ -530,12 +530,21 @@ window.startJobApplication = async (idx) => {
 
   // Fetch questions
   try {
+    console.log('Fetching questions for URL:', job.questions_url);
     const res = await fetch(`${API_BASE}/api/autocalls/get-questions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
       body: JSON.stringify({ questions_url: job.questions_url })
     });
     
+    if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || `Server returned ${res.status}`);
+    }
+
     const questions = await res.json();
     
     jobApplyLoading.classList.add('hidden');
