@@ -271,6 +271,7 @@ async function loadProfileData() {
       // Recommended Jobs
       if (recJobsList) {
         recJobsList.innerHTML = '';
+        window.recommendedJobs = p.recommended_jobs || []; // Store for access
         if (p.recommended_jobs && p.recommended_jobs.length > 0) {
           p.recommended_jobs.forEach((job, idx) => {
             const div = document.createElement('div');
@@ -290,7 +291,7 @@ async function loadProfileData() {
               
               <div class="rec-job-details" style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="rec-job-detail-item">📍 ${job.location}</div>
-                <button class="button small" style="margin: 0;" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
+                <button class="button small" style="margin: 0;" onclick="window.startJobApplication(${idx})">Apply Online</button>
               </div>
 
               <div class="rec-job-expand" onclick="document.getElementById('${toggleId}').classList.toggle('hidden'); this.querySelector('span').textContent = document.getElementById('${toggleId}').classList.contains('hidden') ? '▼' : '▲';" style="text-align: center; cursor: pointer; padding: 8px; color: var(--brand-2); margin-top: 4px;">
@@ -427,5 +428,169 @@ if (btnToggleDetails && profileExtraFields) {
     }
   });
 }
+
+// --- Job Application Logic ---
+
+const applyModal = document.getElementById('job-apply-modal');
+const btnCloseApplyModal = document.getElementById('btn-close-apply-modal');
+const btnCloseSuccess = document.getElementById('btn-close-success');
+const jobApplyForm = document.getElementById('job-apply-form');
+const jobQuestionsContainer = document.getElementById('job-questions-container');
+const jobApplyLoading = document.getElementById('job-apply-loading');
+const jobApplyError = document.getElementById('job-apply-error');
+const jobApplySuccess = document.getElementById('job-apply-success');
+const jobApplyTitle = document.getElementById('job-apply-title');
+
+let currentApplyJob = null;
+
+window.startJobApplication = async (idx) => {
+  const job = window.recommendedJobs[idx];
+  if (!job) return;
+  
+  currentApplyJob = job;
+  jobApplyTitle.textContent = `Apply for ${job.title}`;
+  
+  // Reset UI
+  jobQuestionsContainer.innerHTML = '';
+  jobApplyError.classList.add('hidden');
+  jobApplySuccess.classList.add('hidden');
+  jobApplyForm.classList.remove('hidden');
+  jobApplyLoading.classList.remove('hidden');
+  applyModal.classList.remove('hidden');
+  
+  // Fetch questions
+  try {
+    const res = await fetch(`${API_BASE}/api/autocalls/get-questions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questions_url: job.questions_url })
+    });
+    
+    const questions = await res.json();
+    
+    jobApplyLoading.classList.add('hidden');
+    
+    if (Array.isArray(questions)) {
+      renderQuestions(questions);
+    } else {
+      console.error('Invalid questions format:', questions);
+      throw new Error('Invalid questions format received.');
+    }
+    
+  } catch (err) {
+    jobApplyLoading.classList.add('hidden');
+    jobApplyError.textContent = 'Failed to load application questions. Please try again.';
+    jobApplyError.classList.remove('hidden');
+    console.error(err);
+  }
+};
+
+function renderQuestions(questions) {
+  jobQuestionsContainer.innerHTML = '';
+  
+  questions.forEach(q => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'field-group';
+    wrapper.style.marginBottom = '15px';
+    
+    const label = document.createElement('label');
+    label.className = 'label';
+    label.style.display = 'block';
+    label.style.marginBottom = '5px';
+    label.style.color = 'var(--muted)';
+    label.textContent = q.question + (q.required ? ' *' : '');
+    wrapper.appendChild(label);
+    
+    let input;
+    
+    if (q.type === 'select') {
+      input = document.createElement('select');
+      input.name = q.id;
+      input.required = q.required;
+      input.style.width = '100%';
+      input.style.padding = '10px';
+      input.style.background = 'rgba(255,255,255,0.05)';
+      input.style.border = '1px solid var(--border)';
+      input.style.borderRadius = '8px';
+      input.style.color = '#fff';
+      
+      input.innerHTML = '<option value="">Select an option...</option>';
+      if (q.options) {
+        q.options.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt.value;
+          option.textContent = opt.label;
+          input.appendChild(option);
+        });
+      }
+    } else {
+      // Default to text
+      input = document.createElement('input');
+      input.type = 'text';
+      input.name = q.id;
+      input.required = q.required;
+      input.style.width = '100%';
+      input.style.padding = '10px';
+      input.style.background = 'rgba(255,255,255,0.05)';
+      input.style.border = '1px solid var(--border)';
+      input.style.borderRadius = '8px';
+      input.style.color = '#fff';
+    }
+    
+    wrapper.appendChild(input);
+    jobQuestionsContainer.appendChild(wrapper);
+  });
+}
+
+jobApplyForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!currentApplyJob) return;
+  
+  const formData = new FormData(jobApplyForm);
+  const answers = {};
+  formData.forEach((value, key) => {
+    answers[key] = value;
+  });
+  
+  const btnSubmit = document.getElementById('btn-submit-application');
+  btnSubmit.disabled = true;
+  btnSubmit.textContent = 'Submitting...';
+  jobApplyError.classList.add('hidden');
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/autocalls/submit-application`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        apply_url: currentApplyJob.apply_url,
+        answers: answers
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.success) {
+      jobApplyForm.classList.add('hidden');
+      jobApplySuccess.classList.remove('hidden');
+    } else {
+      throw new Error(result.error || 'Submission failed.');
+    }
+    
+  } catch (err) {
+    jobApplyError.textContent = err.message || 'Error submitting application.';
+    jobApplyError.classList.remove('hidden');
+  } finally {
+    btnSubmit.disabled = false;
+    btnSubmit.textContent = 'Submit Application';
+  }
+});
+
+btnCloseApplyModal.addEventListener('click', () => {
+  applyModal.classList.add('hidden');
+});
+
+btnCloseSuccess.addEventListener('click', () => {
+  applyModal.classList.add('hidden');
+});
 
 init();
