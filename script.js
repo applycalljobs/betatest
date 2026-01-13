@@ -268,12 +268,13 @@ async function loadProfileData() {
         appList.innerHTML = '<p class="hint">No applications found.</p>';
       }
 
-      // Recommended Jobs
       if (recJobsList) {
         recJobsList.innerHTML = '';
         window.recommendedJobs = p.recommended_jobs || []; // Store for access
+        
         if (p.recommended_jobs && p.recommended_jobs.length > 0) {
-          p.recommended_jobs.forEach((job, idx) => {
+          
+          const createJobCard = (job, idx) => {
             const div = document.createElement('div');
             div.className = 'rec-job-item';
             
@@ -306,8 +307,52 @@ async function loadProfileData() {
                 </div>
               </div>
             `;
-            recJobsList.appendChild(div);
+            return div;
+          };
+
+          // Render first 3 jobs
+          p.recommended_jobs.slice(0, 3).forEach((job, idx) => {
+             recJobsList.appendChild(createJobCard(job, idx));
           });
+
+          // Render remaining jobs hidden
+          if (p.recommended_jobs.length > 3) {
+              const moreContainer = document.createElement('div');
+              moreContainer.className = 'hidden';
+              moreContainer.style.marginTop = '10px';
+              
+              p.recommended_jobs.slice(3).forEach((job, idx) => {
+                  // Adjust index: idx is 0-based from slice, so real index is idx + 3
+                  moreContainer.appendChild(createJobCard(job, idx + 3));
+              });
+              
+              recJobsList.appendChild(moreContainer);
+
+              // Toggle Button
+              const toggleBtn = document.createElement('div');
+              toggleBtn.style.textAlign = 'center';
+              toggleBtn.style.padding = '12px';
+              toggleBtn.style.cursor = 'pointer';
+              toggleBtn.style.background = 'rgba(255,255,255,0.05)';
+              toggleBtn.style.borderRadius = '8px';
+              toggleBtn.style.marginTop = '15px';
+              toggleBtn.style.color = 'var(--brand-2)';
+              toggleBtn.style.fontWeight = '600';
+              toggleBtn.innerHTML = `See ${p.recommended_jobs.length - 3} more matches ▼`;
+              
+              toggleBtn.onclick = () => {
+                  const isHidden = moreContainer.classList.contains('hidden');
+                  if (isHidden) {
+                      moreContainer.classList.remove('hidden');
+                      toggleBtn.innerHTML = 'Show less ▲';
+                  } else {
+                      moreContainer.classList.add('hidden');
+                      toggleBtn.innerHTML = `See ${p.recommended_jobs.length - 3} more matches ▼`;
+                  }
+              };
+              recJobsList.appendChild(toggleBtn);
+          }
+
         } else {
           recJobsList.innerHTML = '<p class="hint">No recommendations available.</p>';
         }
@@ -458,6 +503,29 @@ window.startJobApplication = async (idx) => {
   jobApplyLoading.classList.remove('hidden');
   applyModal.classList.remove('hidden');
   
+  // Check if we have a questions URL
+  if (!job.questions_url) {
+      jobApplyLoading.classList.add('hidden');
+      
+      if (job.apply_url) {
+          jobQuestionsContainer.innerHTML = `
+              <div style="text-align: center; padding: 20px;">
+                  <p style="margin-bottom: 20px; color: var(--muted);">This job requires application on the company website.</p>
+                  <a href="${job.apply_url}" target="_blank" class="btn btn-primary" style="display: inline-block;">
+                      Apply on Company Site <i class="fas fa-external-link-alt"></i>
+                  </a>
+              </div>
+          `;
+          // Hide the main form submit button since we are redirecting
+          const submitBtn = jobApplyForm.querySelector('button[type="submit"]');
+          if (submitBtn) submitBtn.style.display = 'none';
+      } else {
+          jobApplyError.textContent = 'Application details not available for this job.';
+          jobApplyError.classList.remove('hidden');
+      }
+      return;
+  }
+
   // Fetch questions
   try {
     const res = await fetch(`${API_BASE}/api/autocalls/get-questions`, {
