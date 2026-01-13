@@ -63,6 +63,9 @@ const btnUploadCv = document.getElementById('btn-upload-cv');
 const cvMsg = document.getElementById('cv-msg');
 const currentCv = document.getElementById('current-cv');
 
+const statCallsCount = document.getElementById('stat-calls-count');
+const statApplicationsCount = document.getElementById('stat-applications-count');
+
 let authToken = localStorage.getItem('applycall_token');
 
 function init() {
@@ -212,6 +215,14 @@ async function loadProfileData() {
       pWeeklySchedule.value = p.weekly_schedule || '';
       pAvailabilityNotes.value = p.availability_notes || '';
       
+      // Update stats
+      if (statCallsCount) {
+        statCallsCount.textContent = (p.call_history && Array.isArray(p.call_history)) ? p.call_history.length : 0;
+      }
+      if (statApplicationsCount) {
+        statApplicationsCount.textContent = (p.applications && Array.isArray(p.applications)) ? p.applications.length : 0;
+      }
+
       if (p.cv_filename) {
         currentCv.textContent = `Current CV: ${p.cv_filename}`;
       } else {
