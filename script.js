@@ -288,8 +288,9 @@ async function loadProfileData() {
                 <div class="rec-job-match">${job.match_score}% Match</div>
               </div>
               
-              <div class="rec-job-details">
+              <div class="rec-job-details" style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="rec-job-detail-item">📍 ${job.location}</div>
+                <button class="button small" style="margin: 0;" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
               </div>
 
               <div class="rec-job-expand" onclick="document.getElementById('${toggleId}').classList.toggle('hidden'); this.querySelector('span').textContent = document.getElementById('${toggleId}').classList.contains('hidden') ? '▼' : '▲';" style="text-align: center; cursor: pointer; padding: 8px; color: var(--brand-2); margin-top: 4px;">
@@ -301,10 +302,6 @@ async function loadProfileData() {
                    ${job.match_justification ? `<div style="background: rgba(46, 204, 113, 0.1); padding: 8px; border-radius: 4px; margin-bottom: 8px; border-left: 2px solid var(--brand-2);"><strong>Why you fit:</strong> ${job.match_justification}</div>` : ''}
                    <p>${job.description || 'No description available.'}</p>
                    <p style="margin-top: 8px; color: var(--text);">💰 <strong>Pay:</strong> ${job.pay}</p>
-                </div>
-                <div class="rec-job-actions">
-                  <button class="button small" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
-                  <button class="button secondary small" onclick="alert('Initiating call application for ${job.title}...')">Apply via Phone</button>
                 </div>
               </div>
             `;
