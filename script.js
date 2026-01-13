@@ -229,7 +229,9 @@ async function loadProfileData() {
         currentCv.textContent = '';
       }
 
-      callSummary.textContent = p.call_summary || 'No call data available yet.';
+      callSummary.innerHTML = p.search_dna 
+          ? `<strong>Search DNA:</strong> ${p.search_dna}` 
+          : (p.call_summary || 'No call data available yet.');
 
       appList.innerHTML = '';
       if (p.applications && p.applications.length > 0) {
