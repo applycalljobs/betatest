@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=1.1">
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <div class="bg"></div>
@@ -105,11 +105,11 @@
             </div>
             <div class="profile-stats">
             <div class="stat-item">
-              <div id="stat-calls-count" class="stat-value">0</div>
-              <div class="stat-label">Calls</div>
+              <div class="stat-value">1</div>
+              <div class="stat-label">Call</div>
             </div>
             <div class="stat-item">
-              <div id="stat-applications-count" class="stat-value">0</div>
+              <div class="stat-value">1</div>
               <div class="stat-label">Applied</div>
             </div>
           </div>
@@ -117,25 +117,25 @@
 
           <div class="profile-grid">
             
-            <!-- Recommended Jobs -->
-            <div class="panel" style="background: transparent; border: none; padding: 0;">
-              <h3 class="panel-title" style="padding-left: 4px;">
-                <span>�</span> Recommended Jobs
-              </h3>
-              <div id="recommended-jobs-list" class="app-list" style="gap: 20px;">
-                <!-- JS will populate this -->
-                <p class="form-note">Loading recommendations...</p>
-              </div>
-            </div>
-
             <!-- Applications (Moved to Top) -->
             <div class="panel">
               <h3 class="panel-title">
-                <span>�</span> My Applications
+                <span>🚀</span> My Applications
               </h3>
               <div id="applications-list" class="app-list">
                 <!-- JS will populate this -->
                 <p class="form-note">No applications yet.</p>
+              </div>
+            </div>
+
+            <!-- Recommended Jobs -->
+            <div class="panel" style="background: transparent; border: none; padding: 0;">
+              <h3 class="panel-title" style="padding-left: 4px;">
+                <span>🔥</span> Recommended Jobs
+              </h3>
+              <div id="recommended-jobs-list" class="app-list" style="gap: 20px;">
+                <!-- JS will populate this -->
+                <p class="form-note">Loading recommendations...</p>
               </div>
             </div>
 
@@ -235,27 +235,6 @@
         <div>By joining, you agree to be contacted about ApplyCall testing.</div>
       </footer>
     </main>
-    <div id="job-apply-modal" class="modal hidden">
-      <div class="modal-content" style="max-width: 600px; width: 95%;">
-        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 id="job-apply-title" style="margin: 0;">Apply for Job</h3>
-          <button id="btn-close-apply-modal" class="close-btn" style="background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer;">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div id="job-apply-loading" class="hidden" style="text-align: center; padding: 20px; color: var(--muted);">Loading questions...</div>
-          <div id="job-apply-error" class="error-msg hidden" style="color: var(--error); margin-bottom: 15px; padding: 10px; background: rgba(231, 76, 60, 0.1); border-radius: 4px;"></div>
-          <div id="job-apply-success" class="hidden" style="text-align: center; padding: 30px;">
-             <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
-             <p style="font-size: 18px; margin-bottom: 20px;">Application Submitted Successfully!</p>
-             <button id="btn-close-success" class="button primary">Close</button>
-          </div>
-          <form id="job-apply-form">
-            <div id="job-questions-container" style="display: flex; flex-direction: column; gap: 15px; max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
-            <button type="submit" id="btn-submit-application" class="button primary" style="width: 100%; margin-top: 20px;">Submit Application</button>
-          </form>
-        </div>
-      </div>
-    </div>
     <script>
       window.__APPLYCALL_ENDPOINT__ = 'https://script.google.com/macros/s/AKfycbxYm9gLoHjAeUe7UKkIP_6Hp9abiGuHGXt62joibd5NgEAWGEa67ppHSd9Vkjl3cKc/exec';
     </script>
@@ -266,6 +245,6 @@
         token: '729|jbLVptwcSVU5qIjnjiofEcFoP9a13q4kO1boSFDef715fd32'
       };
     </script>
-    <script src="script.js?v=1.3"></script>
+    <script src="script.js"></script>
   </body>
 </html>
