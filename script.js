@@ -265,23 +265,46 @@ async function loadProfileData() {
             const div = document.createElement('div');
             div.className = 'rec-job-item';
             
+            // Handle description toggle
+            window.toggleJobDesc = (id) => {
+              const descEl = document.getElementById(`job-desc-${id}`);
+              const btnEl = document.getElementById(`job-btn-${id}`);
+              if (descEl.classList.contains('hidden')) {
+                descEl.classList.remove('hidden');
+                btnEl.textContent = 'Hide Description';
+              } else {
+                descEl.classList.add('hidden');
+                btnEl.textContent = 'Show Description';
+              }
+            };
+            
+            // Mock description if not present (replace with actual job.description later)
+            const description = job.description || "No description available for this role.";
+
             div.innerHTML = `
               <div class="rec-job-header">
                 <div>
                   <div class="rec-job-title">${job.title}</div>
                   <div class="rec-job-company">${job.company}</div>
                 </div>
-                <div class="rec-job-match">${job.match_score}% Match</div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                   <div class="rec-job-match">${job.match_score}% Match</div>
+                   <button class="button small" style="padding: 4px 12px; font-size: 12px;" onclick="window.open('${job.apply_url || '#'}', '_blank')">Apply Online</button>
+                </div>
               </div>
               
-              <div class="rec-job-details">
-                <div class="rec-job-detail-item">📍 ${job.location}</div>
-                <div class="rec-job-detail-item">💰 ${job.pay}</div>
+              <div class="rec-job-details" style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                   <div class="rec-job-detail-item">📍 ${job.location}</div>
+                   <div class="rec-job-detail-item">💰 ${job.pay}</div>
+                </div>
               </div>
 
-              <div class="rec-job-actions">
-                <button class="button small" onclick="alert('Redirecting to online application for ${job.title}...')">Apply Online</button>
-                <button class="button secondary small" onclick="alert('Initiating call application for ${job.title}...')">Apply via Phone</button>
+              <div style="margin-top: 12px;">
+                 <button id="job-btn-${job.id}" class="button secondary small" style="width: 100%;" onclick="toggleJobDesc('${job.id}')">Show Description</button>
+                 <div id="job-desc-${job.id}" class="job-description hidden" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    ${description}
+                 </div>
               </div>
             `;
             recJobsList.appendChild(div);
