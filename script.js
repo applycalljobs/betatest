@@ -286,17 +286,11 @@ async function loadProfileData() {
                 <div>
                   <div class="rec-job-title">${job.title}</div>
                   <div class="rec-job-company">${job.company}</div>
+                  <div class="rec-job-location">📍 ${job.location}</div>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                    <div class="rec-job-match">${job.match_score}% Match</div>
                    <button class="button small" style="padding: 4px 12px; font-size: 12px;" onclick="window.open('${job.apply_url || '#'}', '_blank')">Apply Online</button>
-                </div>
-              </div>
-              
-              <div class="rec-job-details" style="display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                   <div class="rec-job-detail-item">📍 ${job.location}</div>
-                   <div class="rec-job-detail-item">💰 ${job.pay}</div>
                 </div>
               </div>
 
