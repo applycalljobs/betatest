@@ -290,7 +290,11 @@ async function loadProfileData() {
       pAvailabilityNotes.value = p.availability_notes || '';
       
       if (p.cv_filename) {
-        currentCv.textContent = `Current CV: ${p.cv_filename}`;
+        if (p.cv_url) {
+             currentCv.innerHTML = `Current Resume: <a href="${p.cv_url}" target="_blank" style="color: var(--brand-2); text-decoration: underline;">${p.cv_filename}</a>`;
+        } else {
+             currentCv.textContent = `Current Resume: ${p.cv_filename}`;
+        }
       } else {
         currentCv.textContent = '';
       }
@@ -458,9 +462,9 @@ btnUploadCv.addEventListener('click', async () => {
     const data = await res.json();
     
     if (data.success) {
-      cvMsg.textContent = 'CV uploaded!';
+      cvMsg.textContent = 'Resume uploaded!';
       cvMsg.style.color = 'var(--success)';
-      currentCv.textContent = `Current CV: ${data.filename}`;
+      currentCv.textContent = `Current Resume: ${data.filename}`;
       cvUpload.value = '';
     } else {
       cvMsg.textContent = data.error || 'Upload failed.';
@@ -471,7 +475,7 @@ btnUploadCv.addEventListener('click', async () => {
     cvMsg.style.color = 'var(--error)';
   } finally {
     btnUploadCv.disabled = false;
-    btnUploadCv.textContent = 'Upload CV';
+    btnUploadCv.textContent = 'Upload Resume';
   }
 });
 
