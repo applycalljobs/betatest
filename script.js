@@ -55,6 +55,7 @@ const pAvailabilityNotes = document.getElementById('p-availability-notes');
 const btnSaveProfile = document.getElementById('btn-save-profile');
 const profileMsg = document.getElementById('profile-msg');
 const callSummary = document.getElementById('call-summary');
+const searchDnaBox = document.getElementById('search-dna');
 const appList = document.getElementById('applications-list');
 const recJobsList = document.getElementById('recommended-jobs-list');
 
@@ -62,6 +63,13 @@ const cvUpload = document.getElementById('cv-upload');
 const btnUploadCv = document.getElementById('btn-upload-cv');
 const cvMsg = document.getElementById('cv-msg');
 const currentCv = document.getElementById('current-cv');
+const statCalls = document.getElementById('stat-calls');
+const statApplied = document.getElementById('stat-applied');
+
+const btnShowMoreJobs = document.getElementById('btn-show-more-jobs');
+
+let profileRecommendedJobs = [];
+let showingAllJobs = false;
 
 let authToken = localStorage.getItem('applycall_token');
 
@@ -218,7 +226,21 @@ async function loadProfileData() {
         currentCv.textContent = '';
       }
 
-      callSummary.textContent = p.call_summary || 'No call data available yet.';
+      if (searchDnaBox) {
+        searchDnaBox.textContent = p.search_dna || 'No search DNA available yet.';
+      } else {
+        callSummary.textContent = p.search_dna || 'No search DNA available yet.';
+      }
+
+      if (statCalls) {
+        const c = typeof p.call_count === 'number' ? p.call_count : (Array.isArray(p.call_ids) ? p.call_ids.length : 0);
+        statCalls.textContent = String(c);
+      }
+
+      if (statApplied) {
+        const a = typeof p.application_count === 'number' ? p.application_count : (Array.isArray(p.application_ids) ? p.application_ids.length : 0);
+        statApplied.textContent = String(a);
+      }
 
       appList.innerHTML = '';
       if (p.applications && p.applications.length > 0) {
@@ -257,56 +279,9 @@ async function loadProfileData() {
         appList.innerHTML = '<p class="hint">No applications found.</p>';
       }
 
-      // Recommended Jobs
-      if (recJobsList) {
-        recJobsList.innerHTML = '';
-        if (p.recommended_jobs && p.recommended_jobs.length > 0) {
-          p.recommended_jobs.forEach(job => {
-            const div = document.createElement('div');
-            div.className = 'rec-job-item';
-            
-            // Handle description toggle
-            window.toggleJobDesc = (id) => {
-              const descEl = document.getElementById(`job-desc-${id}`);
-              const btnEl = document.getElementById(`job-btn-${id}`);
-              if (descEl.classList.contains('hidden')) {
-                descEl.classList.remove('hidden');
-                btnEl.textContent = 'Hide Description';
-              } else {
-                descEl.classList.add('hidden');
-                btnEl.textContent = 'Show Description';
-              }
-            };
-            
-            // Mock description if not present (replace with actual job.description later)
-            const description = job.description || "No description available for this role.";
-
-            div.innerHTML = `
-              <div class="rec-job-header">
-                <div>
-                  <div class="rec-job-title">${job.title}</div>
-                  <div class="rec-job-company">${job.company}</div>
-                  <div class="rec-job-location">📍 ${job.location}</div>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-                   <div class="rec-job-match">${job.match_score}% Match</div>
-                   <button class="button small" style="padding: 4px 12px; font-size: 12px;" onclick="window.open('${job.apply_url || '#'}', '_blank')">Apply Online</button>
-                </div>
-              </div>
-
-              <div style="margin-top: 12px;">
-                 <button id="job-btn-${job.id}" class="button secondary small" style="width: 100%;" onclick="toggleJobDesc('${job.id}')">Show Description</button>
-                 <div id="job-desc-${job.id}" class="job-description hidden" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                    ${description}
-                 </div>
-              </div>
-            `;
-            recJobsList.appendChild(div);
-          });
-        } else {
-          recJobsList.innerHTML = '<p class="hint">No recommendations available.</p>';
-        }
-      }
+      profileRecommendedJobs = p.recommended_jobs || [];
+      showingAllJobs = false;
+      renderRecommendedJobs();
 
     } else {
       if (res.status === 401) {
@@ -411,6 +386,74 @@ btnUploadCv.addEventListener('click', async () => {
 const btnToggleDetails = document.getElementById('btn-toggle-details');
 const profileExtraFields = document.getElementById('profile-extra-fields');
 
+function renderRecommendedJobs() {
+  if (!recJobsList) return;
+
+  recJobsList.innerHTML = '';
+
+  if (!profileRecommendedJobs || profileRecommendedJobs.length === 0) {
+    recJobsList.innerHTML = '<p class="hint">No recommendations available.</p>';
+    if (btnShowMoreJobs) {
+      btnShowMoreJobs.classList.add('hidden');
+    }
+    return;
+  }
+
+  const jobsToShow = showingAllJobs ? profileRecommendedJobs : profileRecommendedJobs.slice(0, 3);
+
+  jobsToShow.forEach(job => {
+    const div = document.createElement('div');
+    div.className = 'rec-job-item';
+
+    window.toggleJobDesc = (id) => {
+      const descEl = document.getElementById(`job-desc-${id}`);
+      const btnEl = document.getElementById(`job-btn-${id}`);
+      if (descEl && btnEl) {
+        if (descEl.classList.contains('hidden')) {
+          descEl.classList.remove('hidden');
+          btnEl.textContent = 'Hide Description';
+        } else {
+          descEl.classList.add('hidden');
+          btnEl.textContent = 'Show Description';
+        }
+      }
+    };
+
+    const description = job.description || "No description available for this role.";
+
+    div.innerHTML = `
+      <div class="rec-job-header">
+        <div>
+          <div class="rec-job-title">${job.title}</div>
+          <div class="rec-job-company">${job.company}</div>
+          <div class="rec-job-location">📍 ${job.location}</div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+           <div class="rec-job-match">${job.match_score}% Match</div>
+           <button class="button small" style="padding: 4px 12px; font-size: 12px;" onclick="window.open('${job.apply_url || '#'}', '_blank')">Apply Online</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px;">
+         <button id="job-btn-${job.id}" class="button secondary small" style="width: 100%;" onclick="toggleJobDesc('${job.id}')">Show Description</button>
+         <div id="job-desc-${job.id}" class="job-description hidden" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+            ${description}
+         </div>
+      </div>
+    `;
+    recJobsList.appendChild(div);
+  });
+
+  if (btnShowMoreJobs) {
+    if (profileRecommendedJobs.length > 3) {
+      btnShowMoreJobs.classList.remove('hidden');
+      btnShowMoreJobs.textContent = showingAllJobs ? 'Show fewer matches' : 'Show more matches';
+    } else {
+      btnShowMoreJobs.classList.add('hidden');
+    }
+  }
+}
+
 if (btnToggleDetails && profileExtraFields) {
   btnToggleDetails.addEventListener('click', () => {
     const isExpanded = profileExtraFields.classList.toggle('expanded');
@@ -421,6 +464,13 @@ if (btnToggleDetails && profileExtraFields) {
     if (span) {
       span.textContent = isExpanded ? 'Show Less Details' : 'Show More Details';
     }
+  });
+}
+
+if (btnShowMoreJobs) {
+  btnShowMoreJobs.addEventListener('click', () => {
+    showingAllJobs = !showingAllJobs;
+    renderRecommendedJobs();
   });
 }
 
