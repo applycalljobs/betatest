@@ -326,13 +326,16 @@ async function loadProfileData() {
           const div = document.createElement('div');
           div.className = 'app-item';
           
-          // Format as requested: Job X - Title, Company, Location...
-          // We'll use a clean layout but include all details.
           const title = app.title || 'Unknown Role';
           const company = app.company || 'Unknown Company';
           const location = app.location || '';
           const status = app.status || 'Unknown Status';
           const feedback = app.feedback || '';
+          const hasCvNow = !!(p.cv_url);
+          hasCvForApply = hasCvForApply || hasCvNow;
+          const statusNorm = String(status).trim().toLowerCase();
+          const showApply = statusNorm === 'not applied';
+          const applyDisabled = !hasCvNow;
           
           div.innerHTML = `
             <div style="width:100%">
@@ -349,8 +352,40 @@ async function loadProfileData() {
               <div style="font-size:11px; color: var(--muted); opacity: 0.7;">
                 Detected: ${new Date(app.date).toLocaleDateString()}
               </div>
+              ${showApply ? `
+              <div style="margin-top: 8px;">
+                <button 
+                  class="button small app-apply-btn" 
+                  style="padding: 4px 12px; font-size: 12px;${applyDisabled ? ' opacity: 0.6; cursor: not-allowed;' : ''}"
+                >
+                  ${applyDisabled ? 'Upload a resume to apply' : 'Apply Online'}
+                </button>
+              </div>
+              ` : ''}
             </div>
           `;
+          if (showApply) {
+            const btn = div.querySelector('.app-apply-btn');
+            if (btn) {
+              btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (applyDisabled) {
+                  alert('Please upload a Resume/CV before applying online.');
+                  return;
+                }
+                const jobForApply = {
+                  id: app.id || `app_${index}`,
+                  title: title,
+                  company: company,
+                  location: location,
+                  city: '',
+                  state: '',
+                  questions_url: app.questions_url || ''
+                };
+                openApplyModal(jobForApply);
+              });
+            }
+          }
           appList.appendChild(div);
         });
       } else {
