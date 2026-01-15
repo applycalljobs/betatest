@@ -444,6 +444,11 @@ function renderRecommendedJobs() {
     };
 
     const description = job.description || "No description available for this role.";
+    const justification = job.match_justification ? 
+      `<div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+         <div style="font-weight: 700; color: var(--brand-2); margin-bottom: 4px;">Why you match:</div>
+         <div style="font-style: italic; color: #fff;">${job.match_justification}</div>
+       </div>` : '';
 
     div.innerHTML = `
       <div class="rec-job-header">
@@ -461,6 +466,7 @@ function renderRecommendedJobs() {
       <div style="margin-top: 12px;">
          <button id="job-btn-${job.id}" class="button secondary small" style="width: 100%;" onclick="toggleJobDesc('${job.id}')">Show Description</button>
          <div id="job-desc-${job.id}" class="job-description hidden" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+            ${justification}
             ${description}
          </div>
       </div>
