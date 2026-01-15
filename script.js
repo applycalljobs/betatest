@@ -29,6 +29,9 @@ const API_BASE = window.__APPLYCALL_API_BASE__ || ((window.location.hostname ===
 
 const authModal = document.getElementById('auth-modal');
 const privacyModal = document.getElementById('privacy-modal');
+const applyModal = document.getElementById('apply-modal');
+const applyModalContent = document.getElementById('apply-modal-content');
+const applyModalClose = document.getElementById('apply-modal-close');
 const btnPrivacy = document.getElementById('btn-privacy');
 const loginTermsLink = document.getElementById('login-terms-link');
 const btnLoginNav = document.getElementById('btn-login-nav');
@@ -77,6 +80,7 @@ let showingAllJobs = false;
 
 let authToken = localStorage.getItem('applycall_token');
 let loginPhoneE164 = "";
+let currentProfile = null;
 
 function buildLoginPhoneE164() {
   const raw = loginPhoneInput ? loginPhoneInput.value.trim() : "";
@@ -278,6 +282,7 @@ async function loadProfileData() {
 
     if (data.success) {
       const p = data.profile;
+      currentProfile = p;
       pName.value = p.name || '';
       pEmail.value = p.email || '';
       pLocation.value = p.location || '';
@@ -366,6 +371,8 @@ async function loadProfileData() {
   }
 }
 
+let hasCvForApply = false;
+
 async function loadRecommendedJobs() {
   if (!authToken || !recJobsList) return;
   
@@ -380,6 +387,7 @@ async function loadRecommendedJobs() {
     
     if (data.success) {
       profileRecommendedJobs = data.recommendations || [];
+      hasCvForApply = !!data.has_cv;
       showingAllJobs = false;
       renderRecommendedJobs();
     } else {
@@ -391,6 +399,197 @@ async function loadRecommendedJobs() {
   }
 }
 
+function closeApplyModal() {
+  if (applyModal) {
+    applyModal.classList.add('hidden');
+  }
+  if (applyModalContent) {
+    applyModalContent.innerHTML = '';
+  }
+}
+
+async function openApplyModal(job) {
+  if (!applyModal || !applyModalContent) return;
+  
+  const title = job.title || '';
+  const company = job.company || '';
+  const city = job.city || '';
+  const state = job.state || '';
+  const questionsUrl = job.questions_url || '';
+  
+  let questions = [];
+  if (questionsUrl) {
+    try {
+      const res = await fetch(`${API_BASE}/api/autocalls/get-questions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions_url: questionsUrl })
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        questions = data;
+      } else if (Array.isArray(data.questions)) {
+        questions = data.questions;
+      }
+    } catch (e) {
+      console.error('Error loading job questions', e);
+    }
+  }
+  
+  const resumeName = currentProfile && currentProfile.cv_filename ? currentProfile.cv_filename : 'Resume on file';
+  const emailVal = currentProfile && currentProfile.email ? currentProfile.email : '';
+  const phoneVal = currentProfile && currentProfile.phone ? currentProfile.phone : '';
+  
+  let questionsHtml = '';
+  questions.forEach((q, index) => {
+    if (!q || typeof q !== 'object') return;
+    const qId = q.id || `q_${index}`;
+    const label = q.label || q.question || q.text || `Question ${index + 1}`;
+    questionsHtml += `
+      <div class="field-group">
+        <label class="label" for="apply-q-${qId}">${label}</label>
+        <input id="apply-q-${qId}" name="${qId}" type="text" />
+      </div>
+    `;
+  });
+  
+  applyModalContent.innerHTML = `
+    <h2 class="title" style="font-size: 20px; margin-bottom: 12px;">Apply for ${title}</h2>
+    <p class="subtitle" style="margin-bottom: 16px;">${company}${city || state ? ` • ${city}${city && state ? ', ' : ''}${state}` : ''}</p>
+    <p class="form-note" style="margin-bottom: 12px;">Resume to be submitted: <strong>${resumeName}</strong></p>
+    <form id="apply-form">
+      <div class="field-group">
+        <label class="label" for="apply-email">Email address</label>
+        <input id="apply-email" type="email" value="${emailVal || ''}" />
+      </div>
+      <div class="field-group">
+        <label class="label" for="apply-phone">Phone number</label>
+        <input id="apply-phone" type="text" value="${phoneVal || ''}" />
+      </div>
+      <div class="field-group">
+        <label class="label" for="apply-job-title">Job title</label>
+        <input id="apply-job-title" type="text" value="${title}" />
+      </div>
+      <div class="field-group">
+        <label class="label" for="apply-city">Location city</label>
+        <input id="apply-city" type="text" value="${city}" />
+      </div>
+      <div class="field-group">
+        <label class="label" for="apply-state">Location state</label>
+        <input id="apply-state" type="text" value="${state}" />
+      </div>
+      ${questionsHtml}
+      <div id="apply-form-msg" class="form-note" style="margin-top: 8px;"></div>
+      <button id="apply-submit" type="submit" class="button" style="margin-top: 16px;">Apply</button>
+    </form>
+  `;
+  
+  applyModal.classList.remove('hidden');
+  
+  const formEl = document.getElementById('apply-form');
+  const msgEl = document.getElementById('apply-form-msg');
+  const submitBtn = document.getElementById('apply-submit');
+  
+  if (applyModalClose) {
+    applyModalClose.onclick = () => {
+      closeApplyModal();
+    };
+  }
+  
+  window.addEventListener('click', (e) => {
+    if (e.target === applyModal) {
+      closeApplyModal();
+    }
+  });
+  
+  if (formEl) {
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!authToken) return;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Applying...';
+      }
+      if (msgEl) {
+        msgEl.textContent = '';
+      }
+      
+      const emailInputEl = document.getElementById('apply-email');
+      const phoneInputEl = document.getElementById('apply-phone');
+      const cityInputEl = document.getElementById('apply-city');
+      const stateInputEl = document.getElementById('apply-state');
+      const titleInputEl = document.getElementById('apply-job-title');
+      
+      const email = emailInputEl ? emailInputEl.value.trim() : '';
+      const phone = phoneInputEl ? phoneInputEl.value.trim() : '';
+      const jobTitleVal = titleInputEl ? titleInputEl.value.trim() : title;
+      const cityVal = cityInputEl ? cityInputEl.value.trim() : city;
+      const stateVal = stateInputEl ? stateInputEl.value.trim() : state;
+      
+      const answers = [];
+      questions.forEach((q, index) => {
+        if (!q || typeof q !== 'object') return;
+        const qId = q.id || `q_${index}`;
+        const label = q.label || q.question || q.text || `Question ${index + 1}`;
+        const inputEl = document.getElementById(`apply-q-${qId}`);
+        const answer = inputEl ? inputEl.value.trim() : '';
+        answers.push({
+          id: qId,
+          label: label,
+          answer: answer
+        });
+      });
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/applications`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            job_id: job.id,
+            job_title: jobTitleVal,
+            job_company: company,
+            job_city: cityVal,
+            job_state: stateVal,
+            job_location: job.location || '',
+            email: email,
+            phone: phone,
+            questions: answers
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (msgEl) {
+            msgEl.textContent = 'Application submitted.';
+            msgEl.style.color = 'var(--success)';
+          }
+          await loadProfileData();
+          setTimeout(() => {
+            closeApplyModal();
+          }, 800);
+        } else {
+          if (msgEl) {
+            msgEl.textContent = data.error || 'Failed to submit application.';
+            msgEl.style.color = 'var(--error)';
+          }
+        }
+      } catch (err) {
+        console.error('Error submitting application', err);
+        if (msgEl) {
+          msgEl.textContent = 'Error submitting application.';
+          msgEl.style.color = 'var(--error)';
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Apply';
+        }
+      }
+    });
+  }
+}
 btnSaveProfile.addEventListener('click', async () => {
   if (!authToken) return;
   
@@ -465,6 +664,9 @@ btnUploadCv.addEventListener('click', async () => {
       cvMsg.textContent = 'Resume uploaded!';
       cvMsg.style.color = 'var(--success)';
       currentCv.textContent = `Current Resume: ${data.filename}`;
+      if (!currentProfile) currentProfile = {};
+      currentProfile.cv_filename = data.filename;
+      currentProfile.cv_url = data.cv_url || currentProfile.cv_url || '';
       cvUpload.value = '';
     } else {
       cvMsg.textContent = data.error || 'Upload failed.';
@@ -522,6 +724,10 @@ function renderRecommendedJobs() {
          <div style="font-style: italic; color: #fff;">${job.match_justification}</div>
        </div>` : '';
 
+    const applyDisabled = !hasCvForApply;
+    const applyLabel = applyDisabled ? 'Upload a resume to apply' : 'Apply Online';
+    const applyTitle = applyDisabled ? 'Please upload a Resume/CV before applying online.' : 'Apply for this job online.';
+    
     div.innerHTML = `
       <div class="rec-job-header">
         <div>
@@ -531,7 +737,13 @@ function renderRecommendedJobs() {
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
            <div class="rec-job-match">${job.match_score}% Match</div>
-           <button class="button small" style="padding: 4px 12px; font-size: 12px;" onclick="window.open('${job.apply_url || '#'}', '_blank')">Apply Online</button>
+           <button 
+             class="button small" 
+             style="padding: 4px 12px; font-size: 12px;${applyDisabled ? ' opacity: 0.6; cursor: not-allowed;' : ''}" 
+             title="${applyTitle}"
+             ${applyDisabled ? 'data-disabled="true"' : ''}
+             data-url="${job.apply_url || '#'}"
+           >${applyLabel}</button>
         </div>
       </div>
 
@@ -543,6 +755,19 @@ function renderRecommendedJobs() {
          </div>
       </div>
     `;
+    const buttonEl = div.querySelector('button.button.small');
+    if (buttonEl) {
+      buttonEl.addEventListener('click', (e) => {
+        const disabled = buttonEl.getAttribute('data-disabled') === 'true';
+        if (disabled) {
+          e.preventDefault();
+          alert('Please upload a Resume/CV before applying online.');
+          return;
+        }
+        openApplyModal(job);
+      });
+    }
+    
     recJobsList.appendChild(div);
   });
 
