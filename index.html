@@ -21,8 +21,24 @@
           <p class="subtitle">Enter your phone number to access your profile.</p>
           <div class="field-group">
             <label for="login-phone" class="label">Phone number</label>
-            <input id="login-phone" type="tel" placeholder="+15551234567" />
+            <div class="phone-row">
+              <select id="login-country-code" name="loginCountryCode" class="select" style="width: 110px;">
+                <option value="+1">+1 US</option>
+                <option value="+44">+44 UK</option>
+                <option value="+61">+61 AU</option>
+                <option value="+91">+91 IN</option>
+                <option value="+81">+81 JP</option>
+                <option value="+49">+49 DE</option>
+                <option value="+33">+33 FR</option>
+                <option value="+971">+971 AE</option>
+              </select>
+              <input id="login-phone" type="tel" placeholder="555 123 4567" />
+            </div>
           </div>
+          <p class="form-note" style="text-align: left; font-size: 12px; margin-top: 4px;">
+            By providing your mobile number, you agree that it may be used to send a one-time message to verify your account. Message and data rates may apply.
+            <a href="#" id="login-terms-link" style="color: var(--muted); text-decoration: underline;">View Terms and Privacy Policy</a>
+          </p>
           <button id="btn-request-otp" class="button" style="margin-top: 16px;">Send Code</button>
         </div>
         <div id="step-otp" class="hidden">
@@ -34,6 +50,38 @@
           <button id="btn-verify-otp" class="button" style="margin-top: 16px;">Verify & Login</button>
         </div>
         <div id="auth-error" class="error"></div>
+      </div>
+    </div>
+
+    <div id="privacy-modal" class="modal hidden">
+      <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+        <span class="close-modal">&times;</span>
+        <h2 class="title" style="font-size: 20px; margin-bottom: 16px;">Privacy Policy & Terms and Conditions</h2>
+        <div id="privacy-text" style="text-align: left; font-size: 14px; line-height: 1.5; color: #ddd;">
+          <p><strong>Effective Date:</strong> January 15, 2026</p>
+          <p><strong>1. ABOUT US</strong> ApplyCall.jobs is operated by BLAT Ltd, headquartered at 86-90 Paul Street, London, England, United Kingdom, EC2A 4NE. For all data inquiries, please contact ben@applycall.com.</p>
+          <p><strong>2. DATA CATEGORIES AND AI PROCESSING</strong> By using our service, you provide us with specific categories of personal data:</p>
+          <p><strong>Audio Recordings and Transcripts:</strong> We record phone interviews and use Generative AI (including GPT-5 models) to transcribe and analyze your voice data.</p>
+          <p><strong>Search DNA:</strong> Our "Candidate Recommender" engine uses automated profiling to evaluate your skills, career goals, and professional experience.</p>
+          <p><strong>Contact Data:</strong> We collect your name, phone number, and email address, primarily processed for SMS-based identity verification (OTP).</p>
+          <p><strong>3. LAWFUL BASIS FOR PROCESSING</strong> We process your data under the following legal frameworks:</p>
+          <p><strong>Legitimate Interest:</strong> To provide recruitment matching services and optimize our candidate recommendation logic.</p>
+          <p><strong>Contractual Necessity:</strong> To fulfill our agreement to assist in your job search and match you with employers.</p>
+          <p><strong>Explicit Consent:</strong> Required for the recording of calls and the processing of audio data for AI analysis.</p>
+          <p><strong>4. SHARING WITH THIRD PARTIES</strong> To fulfill our matching service, your "Search DNA" and AI-generated Match Justifications are transmitted to potential employers and their authorized data processors. These parties act as independent data controllers.</p>
+          <p><strong>5. INTERNATIONAL DATA TRANSFERS</strong> As a UK-based entity serving candidates in the US and other regions, we transfer data across international borders. We comply with the UK-US Data Bridge and utilize Standard Contractual Clauses (SCCs) to ensure your data receives protections equivalent to the UK GDPR.</p>
+          <p><strong>6. DATA RETENTION</strong> We retain your data based on your "Last Activity Date" (the last time you utilized our call service, logged in, or applied for a role). This ensures you remain discoverable for future opportunities. You may request the deletion of your data at any time by contacting ben@applycall.com.</p>
+          <p><strong>PART 2: TERMS AND CONDITIONS FOR APPLYCALL.JOBS</strong></p>
+          <p><strong>Last Updated:</strong> January 15, 2026</p>
+          <p><strong>1. ACCEPTANCE OF TERMS</strong> By entering your phone number on ApplyCall.jobs and participating in an AI-driven interview, you agree to these Terms and Conditions. If you do not agree to these terms, please do not use the service.</p>
+          <p><strong>2. SERVICE DESCRIPTION AND DISCLAIMER</strong> ApplyCall.jobs provides an automated matching service for guidance purposes only. We do not guarantee employment, interviews, or specific career outcomes. Final hiring decisions are made solely by third-party employers.</p>
+          <p><strong>3. AI ACCURACY AND "NO WARRANTY" CLAUSE</strong> We make every effort to ensure matching accuracy, but you acknowledge that information is generated by AI. We do not give any warranty regarding the accuracy, completeness, or fitness for purpose of any AI-generated match justifications or "Search DNA" profiles. You acknowledge that AI may occasionally generate inaccurate information ("hallucinations"), and ApplyCall is not liable for any employment-related decisions arising from these outputs.</p>
+          <p><strong>4. CALL RECORDING AND CONSENT</strong> Participation in our phone-based matching constitutes explicit consent to be recorded and transcribed. We provide a verbal disclosure at the start of every call to ensure compliance with international and US state "Two-Party Consent" laws. Staying on the line after this disclosure constitutes your continued consent.</p>
+          <p><strong>5. SMS COMMUNICATION</strong> We utilize SMS for identity verification (One-Time Passwords). By providing your number, you consent to receive these automated messages. Standard message and data rates may apply. You can opt-out of the service at any time, which may limit your access to the platform.</p>
+          <p><strong>6. LIMITATION OF LIABILITY</strong> ApplyCall.jobs is a matching platform, not an employer. We are not liable for the content of third-party job descriptions, the failure of an employer to contact a candidate, or the outcome of any external application process.</p>
+          <p><strong>7. GOVERNING LAW</strong> These terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of London.</p>
+          <p><strong>8. CONTACT INFORMATION</strong> ApplyCall, 86-90 Paul Street, London, England, United Kingdom, EC2A 4NE. Email: ben@applycall.com.</p>
+        </div>
       </div>
     </div>
 
@@ -235,6 +283,9 @@
 
       <footer class="footer" style="padding: 20px; margin-top: auto;">
         <div>By joining, you agree to be contacted about ApplyCall testing.</div>
+        <div style="margin-top: 12px; text-align: center;">
+          <a id="btn-privacy" href="#" style="color: var(--muted); text-decoration: underline; font-size: 12px;">Privacy Policy & Terms</a>
+        </div>
       </footer>
     </main>
     <script>
