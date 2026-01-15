@@ -25,9 +25,12 @@ findBtn.addEventListener("click",()=>handleAction("find"));
 waitlistBtn.addEventListener("click",()=>handleAction("waitlist"));
 updateState();
 
-const API_BASE = 'https://basic.applycall.jobs';
+const API_BASE = window.__APPLYCALL_API_BASE__ || ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "" : "https://basic.applycall.jobs");
 
 const authModal = document.getElementById('auth-modal');
+const privacyModal = document.getElementById('privacy-modal');
+const btnPrivacy = document.getElementById('btn-privacy');
+const loginTermsLink = document.getElementById('login-terms-link');
 const btnLoginNav = document.getElementById('btn-login-nav');
 const btnLogoutNav = document.getElementById('btn-logout-nav');
 const closeModal = document.querySelector('.close-modal');
@@ -41,6 +44,7 @@ const profileView = document.getElementById('profile-view');
 
 const loginPhoneInput = document.getElementById('login-phone');
 const loginOtpInput = document.getElementById('login-otp');
+const loginCountryCodeSelect = document.getElementById('login-country-code');
 
 const pName = document.getElementById('p-name');
 const pEmail = document.getElementById('p-email');
@@ -72,6 +76,17 @@ let profileRecommendedJobs = [];
 let showingAllJobs = false;
 
 let authToken = localStorage.getItem('applycall_token');
+let loginPhoneE164 = "";
+
+function buildLoginPhoneE164() {
+  const raw = loginPhoneInput ? loginPhoneInput.value.trim() : "";
+  if (!raw) return "";
+  const code = loginCountryCodeSelect ? loginCountryCodeSelect.value : "";
+  let digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return "";
+  if (!code) return "";
+  return `${code}${digits}`;
+}
 
 function init() {
   if (authToken) {
@@ -108,12 +123,64 @@ if (btnLoginNav) {
       if (loginPhoneInput) loginPhoneInput.value = '';
       if (loginOtpInput) loginOtpInput.value = '';
     }
+    loginPhoneE164 = "";
   });
 }
 
 closeModal.addEventListener('click', () => {
   authModal.classList.add('hidden');
 });
+
+if (btnPrivacy) {
+  btnPrivacy.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (privacyModal) privacyModal.classList.remove('hidden');
+  });
+}
+
+if (loginTermsLink) {
+  loginTermsLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (privacyModal) privacyModal.classList.remove('hidden');
+  });
+}
+
+if (privacyModal) {
+  const closePrivacy = privacyModal.querySelector('.close-modal');
+  if (closePrivacy) {
+    closePrivacy.addEventListener('click', () => {
+      privacyModal.classList.add('hidden');
+    });
+  }
+  
+  window.addEventListener('click', (e) => {
+    if (e.target === privacyModal) {
+      privacyModal.classList.add('hidden');
+    }
+  });
+}
+
+if (btnPrivacy) {
+  btnPrivacy.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (privacyModal) privacyModal.classList.remove('hidden');
+  });
+}
+
+if (privacyModal) {
+  const closePrivacy = privacyModal.querySelector('.close-modal');
+  if (closePrivacy) {
+    closePrivacy.addEventListener('click', () => {
+      privacyModal.classList.add('hidden');
+    });
+  }
+  
+  window.addEventListener('click', (e) => {
+    if (e.target === privacyModal) {
+      privacyModal.classList.add('hidden');
+    }
+  });
+}
 
 window.addEventListener('click', (e) => {
   if (e.target === authModal) {
@@ -129,7 +196,8 @@ btnLogoutNav.addEventListener('click', () => {
 
 
 btnRequestOtp.addEventListener('click', async () => {
-  const phone = loginPhoneInput.value.trim();
+  const phone = buildLoginPhoneE164();
+  loginPhoneE164 = phone;
   if (!phone) {
     authError.textContent = 'Please enter a phone number.';
     return;
@@ -163,7 +231,7 @@ btnRequestOtp.addEventListener('click', async () => {
 });
 
 btnVerifyOtp.addEventListener('click', async () => {
-  const phone = loginPhoneInput.value.trim();
+  const phone = loginPhoneE164 || buildLoginPhoneE164();
   const code = loginOtpInput.value.trim();
   
   if (!code) {
