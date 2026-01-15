@@ -94,6 +94,7 @@ function showProfile() {
   btnLoginNav.classList.add('hidden');
   btnLogoutNav.classList.remove('hidden');
   loadProfileData();
+  loadRecommendedJobs();
 }
 
 if (btnLoginNav) {
@@ -279,9 +280,7 @@ async function loadProfileData() {
         appList.innerHTML = '<p class="hint">No applications found.</p>';
       }
 
-      profileRecommendedJobs = p.recommended_jobs || [];
-      showingAllJobs = false;
-      renderRecommendedJobs();
+      // Recommendations are now fetched separately via loadRecommendedJobs()
 
     } else {
       if (res.status === 401) {
@@ -292,6 +291,31 @@ async function loadProfileData() {
     }
   } catch (err) {
     console.error('Error loading profile:', err);
+  }
+}
+
+async function loadRecommendedJobs() {
+  if (!authToken || !recJobsList) return;
+  
+  // Show loading state
+  recJobsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);"><div class="spinner"></div><p style="margin-top:10px;">Finding the best matches for you...</p></div>';
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/recommendations`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      profileRecommendedJobs = data.recommendations || [];
+      showingAllJobs = false;
+      renderRecommendedJobs();
+    } else {
+       recJobsList.innerHTML = '<p class="hint">Unable to load recommendations.</p>';
+    }
+  } catch (err) {
+    console.error('Error loading recommendations:', err);
+    recJobsList.innerHTML = '<p class="hint">Error loading recommendations.</p>';
   }
 }
 
