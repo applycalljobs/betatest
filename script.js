@@ -777,7 +777,6 @@ function renderRecommendedJobs() {
              style="padding: 4px 12px; font-size: 12px;${applyDisabled ? ' opacity: 0.6; cursor: not-allowed;' : ''}" 
              title="${applyTitle}"
              ${applyDisabled ? 'data-disabled="true"' : ''}
-             data-url="${job.apply_url || '#'}"
            >${applyLabel}</button>
         </div>
       </div>
@@ -793,9 +792,9 @@ function renderRecommendedJobs() {
     const buttonEl = div.querySelector('button.button.small');
     if (buttonEl) {
       buttonEl.addEventListener('click', (e) => {
+        e.preventDefault();
         const disabled = buttonEl.getAttribute('data-disabled') === 'true';
         if (disabled) {
-          e.preventDefault();
           alert('Please upload a Resume/CV before applying online.');
           return;
         }
