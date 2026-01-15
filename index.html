@@ -105,11 +105,11 @@
             </div>
             <div class="profile-stats">
             <div class="stat-item">
-              <div class="stat-value">1</div>
+              <div id="stat-calls" class="stat-value">0</div>
               <div class="stat-label">Call</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">1</div>
+              <div id="stat-applied" class="stat-value">0</div>
               <div class="stat-label">Applied</div>
             </div>
           </div>
@@ -126,17 +126,17 @@
                 <!-- JS will populate this -->
                 <p class="form-note">Loading recommendations...</p>
               </div>
+              <button id="btn-show-more-jobs" class="button secondary small hidden" style="margin-top: 12px;">
+                Show more matches
+              </button>
             </div>
 
-            <!-- Applications (Moved to Top) -->
+            <!-- Search DNA / Insights -->
             <div class="panel">
               <h3 class="panel-title">
-                <span>🚀</span> My Applications
+                <span>🧬</span> Search DNA
               </h3>
-              <div id="applications-list" class="app-list">
-                <!-- JS will populate this -->
-                <p class="form-note">No applications yet.</p>
-              </div>
+              <div id="search-dna" class="info-box" style="font-size: 14px; color: #ddd;">No search DNA available yet.</div>
             </div>
 
             <!-- Personal Info -->
@@ -206,12 +206,14 @@
               <div id="profile-msg" class="form-note"></div>
             </div>
 
-            <!-- Call Insights -->
             <div class="panel">
               <h3 class="panel-title">
-                <span>📞</span> Latest Call Insights
+                <span>🚀</span> My Applications
               </h3>
-              <div id="call-summary" class="info-box" style="font-size: 14px; color: #ddd;">No calls recorded yet.</div>
+              <div id="applications-list" class="app-list">
+                <!-- JS will populate this -->
+                <p class="form-note">No applications yet.</p>
+              </div>
             </div>
 
             <!-- CV Upload -->
