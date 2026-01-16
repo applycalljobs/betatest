@@ -310,6 +310,7 @@ async function loadProfileData() {
       } else {
         currentCv.textContent = '';
       }
+      hasCvForApply = !!(p.cv_url || p.generated_resume_url || hasCvForApply);
 
       if (searchDnaBox) {
         searchDnaBox.textContent = p.search_dna || 'No search DNA available yet.';
@@ -709,7 +710,10 @@ btnUploadCv.addEventListener('click', async () => {
       if (!currentProfile) currentProfile = {};
       currentProfile.cv_filename = data.filename;
       currentProfile.cv_url = data.cv_url || currentProfile.cv_url || '';
+      hasCvForApply = true;
       cvUpload.value = '';
+      await loadProfileData();
+      await loadRecommendedJobs();
     } else {
       cvMsg.textContent = data.error || 'Upload failed.';
       cvMsg.style.color = 'var(--error)';
