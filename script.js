@@ -114,13 +114,13 @@ function showLanding() {
   btnLogoutNav.classList.add('hidden');
 }
 
-function showProfile() {
+async function showProfile() {
   landingView.classList.add('hidden');
   profileView.classList.remove('hidden');
   btnLoginNav.classList.add('hidden');
   btnLogoutNav.classList.remove('hidden');
-  loadProfileData();
-  loadRecommendedJobs();
+  await loadProfileData();
+  await loadRecommendedJobs();
 }
 
 if (btnLoginNav) {
@@ -310,7 +310,7 @@ async function loadProfileData() {
       } else {
         currentCv.textContent = '';
       }
-      hasCvForApply = !!(p.cv_url || p.generated_resume_url || hasCvForApply);
+      hasCvForApply = !!(p.cv_url || p.generated_resume_url);
 
       if (searchDnaBox) {
         searchDnaBox.textContent = p.search_dna || 'No search DNA available yet.';
@@ -339,7 +339,7 @@ async function loadProfileData() {
           const location = app.location || '';
           const status = app.status || 'Unknown Status';
           const feedback = app.feedback || '';
-          const hasCvNow = !!(p.cv_url);
+          const hasCvNow = !!(p.cv_url || p.generated_resume_url);
           hasCvForApply = hasCvForApply || hasCvNow;
           const statusNorm = String(status).trim().toLowerCase();
           const showApply = statusNorm === 'not applied';
