@@ -28,8 +28,24 @@ if (window.__APPLYCALL_MAIN_LOADED__) {
   phoneInput.addEventListener("input",updateState);
   emailInput.addEventListener("input",updateState);
   codeSelect.addEventListener("change",updateState);
-  findBtn.addEventListener("click",()=>handleAction("find"));
-  waitlistBtn.addEventListener("click",()=>handleAction("waitlist"));
+  findBtn.addEventListener("click",()=>{
+    if(typeof gtag === 'function') {
+        gtag('event', 'find_job_click', {
+            'event_category': 'engagement',
+            'event_label': 'Find Job Button'
+        });
+    }
+    handleAction("find");
+  });
+  waitlistBtn.addEventListener("click",()=>{
+    if(typeof gtag === 'function') {
+        gtag('event', 'waitlist_click', {
+            'event_category': 'engagement',
+            'event_label': 'Waitlist Button'
+        });
+    }
+    handleAction("waitlist");
+  });
   updateState();
 
 const API_BASE = window.__APPLYCALL_API_BASE__ || ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "" : "https://basic.applycall.jobs");
@@ -126,6 +142,7 @@ async function showProfile() {
 if (btnLoginNav) {
   btnLoginNav.addEventListener('click', () => {
     console.log('Login button clicked');
+    
     if (authModal) {
       authModal.classList.remove('hidden');
       if (stepPhone) stepPhone.classList.remove('hidden');
@@ -262,6 +279,12 @@ btnVerifyOtp.addEventListener('click', async () => {
     const data = await res.json();
 
     if (data.success) {
+      if(typeof gtag === 'function') {
+          gtag('event', 'login_success', {
+              'event_category': 'authentication',
+              'event_label': 'Login Success'
+          });
+      }
       authToken = data.token; // In this mock, token is just the phone number
       localStorage.setItem('applycall_token', authToken);
       authModal.classList.add('hidden');
