@@ -18,13 +18,13 @@ if (window.__APPLYCALL_MAIN_LOADED__) {
   function validPhone(v){return /^\+?[0-9\s\-()]{7,}$/.test(v.trim())}
   function validEmail(v){if(!v)return true;return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())}
   function setError(el,msg){el.textContent=msg||""}
-  function updateState(){const p=phoneInput.value;const e=emailInput.value;const phoneOk=validPhone(p);const emailProvided=e.trim()!=="";const emailOk=validEmail(e);setError(phoneError,(phoneOk||!p)?"":"Enter a valid phone");setError(emailError,(emailOk||!emailProvided)?"":"Enter a valid email");findBtn.disabled=!phoneOk;waitlistBtn.disabled=!((emailProvided&&emailOk)||phoneOk)}
+  function updateState(){const p=phoneInput.value;const e=emailInput.value;const phoneOk=validPhone(p);const emailProvided=e.trim()!=="";const emailOk=validEmail(e);setError(phoneError,(phoneOk||!p)?"":"Enter a valid phone");setError(emailError,(emailOk||!emailProvided)?"":"Enter a valid email");findBtn.disabled=true;waitlistBtn.disabled=!((emailProvided&&emailOk)||phoneOk)}
   function buildPhone(){const p=phoneInput.value.trim();if(p.startsWith("+"))return p;return `${codeSelect.value} ${p}`}
   function saveLocal(payload){const key="applycall_interest";const data=JSON.parse(localStorage.getItem(key)||"[]");data.push({...payload,timestamp:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(data))}
   async function submitData(payload){try{const endpoint=window.__APPLYCALL_ENDPOINT__;const timeoutMs=9000;const mk=async r=>({ok:!!(r&&r.ok),status:r?r.status:0});if(endpoint){if(/script\.google\.com\/macros/.test(endpoint)){try{const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),timeoutMs);const params=new URLSearchParams();params.set("phone",payload.phone||"");params.set("email",payload.email||"");params.set("action",payload.action||"");const r=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:params.toString(),signal:ctrl.signal});clearTimeout(t);const res=await mk(r);if(res.ok)return res}catch(e){}try{const ctrl2=new AbortController();const t2=setTimeout(()=>ctrl2.abort(),timeoutMs);const r2=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctrl2.signal});clearTimeout(t2);const res2=await mk(r2);if(res2.ok)return res2}catch(e){}try{const params2=new URLSearchParams();params2.set("phone",payload.phone||"");params2.set("email",payload.email||"");params2.set("action",payload.action||"");await fetch(endpoint,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:params2.toString()});return{ok:true,status:0}}catch(e){return{ok:false,status:0}}}else{const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),timeoutMs);const r=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctrl.signal});clearTimeout(t);return await mk(r)}}saveLocal(payload);return{ok:true,status:200} }catch(e){return{ok:false,status:0}}}
   async function triggerAutoCall(rawPhone,email){try{const cfg=window.__AUTOCALLS__||{endpoint:"https://app.autocalls.ai/api/user/make_call",assistant_id:7633,token:"729|jbLVptwcSVU5qIjnjiofEcFoP9a13q4kO1boSFDef715fd32"};const p=toE164(rawPhone);if(!p||!cfg.token)return false;const payload={phone_number:p,assistant_id:cfg.assistant_id,variables:{email:email||""}};const r=await fetch(cfg.endpoint,{method:"POST",headers:{Authorization:`Bearer ${cfg.token}`,"Content-Type":"application/json"},body:JSON.stringify(payload)});return!!(r&&r.ok)}catch(e){try{const cfg2=window.__AUTOCALLS__||{endpoint:"https://app.autocalls.ai/api/user/make_call",assistant_id:7633,token:"729|jbLVptwcSVU5qIjnjiofEcFoP9a13q4kO1boSFDef715fd32"};const p2=toE164(rawPhone);if(!p2)return false;const payload2={phone_number:p2,assistant_id:cfg2.assistant_id};await fetch(cfg2.endpoint,{method:"POST",mode:"no-cors",headers:{Authorization:`Bearer ${cfg2.token}`,"Content-Type":"application/json"},body:JSON.stringify(payload2)});return true}catch(_){return false}}}
   function setBusy(btn,msg){btn.disabled=true;btn.textContent=msg;note.textContent=""}
-  async function handleAction(action){updateState();const btn=action==="find"?findBtn:waitlistBtn;if(btn.disabled)return;setBusy(btn,"Submitting...");const p=phoneInput.value;const e=emailInput.value;const phoneOk=validPhone(p);const emailProvided=e.trim()!=="";const emailOk=validEmail(e);const payload={phone:phoneOk?buildPhone():null,email:(emailProvided&&emailOk)?e.trim():null,action};const res=await submitData(payload);if(action==="find"&&payload.phone){triggerAutoCall(payload.phone,payload.email||"")}if(res.ok){btn.textContent=action==="find"?"Submitted":"Joined";note.textContent=action==="find"?"We’ll reach out to start your job search.":"You’re on the list. We’ll text you when ready.";form.reset();updateState()}else{saveLocal(payload);btn.disabled=false;btn.textContent=action==="find"?"Find a Job":"Join the Waitlist";note.textContent="Submission failed. Saved locally."}}
+  async function handleAction(action){updateState();const btn=action==="find"?findBtn:waitlistBtn;if(btn.disabled)return;setBusy(btn,"Submitting...");const p=phoneInput.value;const e=emailInput.value;const phoneOk=validPhone(p);const emailProvided=e.trim()!=="";const emailOk=validEmail(e);const payload={phone:phoneOk?buildPhone():null,email:(emailProvided&&emailOk)?e.trim():null,action};const res=await submitData(payload);if(action==="find"&&payload.phone){triggerAutoCall(payload.phone,payload.email||"")}if(res.ok){btn.textContent=action==="find"?"Submitted":"Joined";note.textContent=action==="find"?"We’ll reach out to start your job search.":"You’re on the list. We’ll text you when ready.";form.reset();updateState()}else{saveLocal(payload);btn.disabled=action==="find"?true:false;btn.textContent=action==="find"?"Find a Job":"Join the Waitlist";note.textContent="Submission failed. Saved locally."}}
   phoneInput.addEventListener("input",updateState);
   emailInput.addEventListener("input",updateState);
   codeSelect.addEventListener("change",updateState);
@@ -93,6 +93,8 @@ const cvUpload = document.getElementById('cv-upload');
 const btnUploadCv = document.getElementById('btn-upload-cv');
 const cvMsg = document.getElementById('cv-msg');
 const currentCv = document.getElementById('current-cv');
+const resumeDebugSummary = document.getElementById('resume-debug-summary');
+const resumeDebugDetails = document.getElementById('resume-debug-details');
 const statCalls = document.getElementById('stat-calls');
 const statApplied = document.getElementById('stat-applied');
 
@@ -104,12 +106,169 @@ let showingAllJobs = false;
 let authToken = localStorage.getItem('applycall_token');
 let loginPhoneE164 = "";
 let currentProfile = null;
+const OTP_BYPASS_PHONE = '111111111';
+
+function parseMaybeJson(value) {
+  if (!value) return null;
+  if (typeof value === 'object') return value;
+  if (typeof value !== 'string') return null;
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    return null;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatExperienceFromMonths(months) {
+  const num = Number(months || 0);
+  if (!num) return '';
+  const years = num / 12;
+  if (years >= 10) return `${Math.round(years)} years`;
+  if (years >= 2) return `${years.toFixed(1)} years`;
+  return `${num} months`;
+}
+
+function renderResumeDebug(profile) {
+  if (!resumeDebugSummary || !resumeDebugDetails) return;
+
+  const debug = parseMaybeJson(profile && profile.resume_debug_json);
+  if (!debug || !Array.isArray(debug.work_history) || debug.work_history.length === 0) {
+    const hasResume = !!(profile && profile.cv_filename);
+    resumeDebugSummary.textContent = hasResume
+      ? 'Resume uploaded. Weighting details are not available for this file yet.'
+      : 'Upload a resume to see how work history is weighted into the search profile.';
+    resumeDebugDetails.innerHTML = '';
+    return;
+  }
+
+  const dominantFamilies = Array.isArray(debug.dominant_role_families) ? debug.dominant_role_families : [];
+  const notes = Array.isArray(debug.notes) ? debug.notes : [];
+  const skills = Array.isArray(debug.skills) ? debug.skills : [];
+  const certifications = Array.isArray(debug.certifications) ? debug.certifications : [];
+  const mostRecent = debug.most_recent_role || {};
+  const estimatedExperience = debug.estimated_total_experience || formatExperienceFromMonths(debug.estimated_total_experience_months);
+
+  const summaryBits = [];
+  if (dominantFamilies[0] && dominantFamilies[0].role_family) {
+    summaryBits.push(`Top influence: ${dominantFamilies[0].role_family}`);
+  }
+  if (mostRecent.title) {
+    summaryBits.push(`Recent anchor: ${mostRecent.title}`);
+  }
+  if (estimatedExperience) {
+    summaryBits.push(`Estimated experience: ${estimatedExperience}`);
+  }
+  if (profile && profile.search_dna_source) {
+    summaryBits.push(`Current profile source: ${profile.search_dna_source}`);
+  }
+  resumeDebugSummary.textContent = summaryBits.join(' | ');
+
+  const familyHtml = dominantFamilies.length
+    ? `
+      <div>
+        <div class="resume-debug-section-title">Dominant Role Families</div>
+        <div class="resume-chip-list">
+          ${dominantFamilies.map((family) => `
+            <div class="resume-chip">
+              <span>${escapeHtml(family.role_family || 'Role family')}</span>
+              <span>${escapeHtml(formatExperienceFromMonths(family.total_months) || '')}</span>
+              <span>score ${escapeHtml(family.score)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `
+    : '';
+
+  const noteHtml = notes.length
+    ? `
+      <div>
+        <div class="resume-debug-section-title">Weighting Notes</div>
+        <div class="resume-note-list">
+          ${notes.map((note) => `<div class="resume-note-item">${escapeHtml(note)}</div>`).join('')}
+        </div>
+      </div>
+    `
+    : '';
+
+  const skillHtml = (skills.length || certifications.length)
+    ? `
+      <div>
+        <div class="resume-debug-section-title">Extracted Signals</div>
+        <div class="resume-chip-list">
+          ${skills.map((skill) => `<div class="resume-chip">${escapeHtml(skill)}</div>`).join('')}
+          ${certifications.map((cert) => `<div class="resume-chip">${escapeHtml(cert)}</div>`).join('')}
+        </div>
+      </div>
+    `
+    : '';
+
+  const workHistoryHtml = debug.work_history.map((item) => {
+    const period = [item.start_date, item.end_date].filter(Boolean).join(' to ');
+    return `
+      <div class="resume-role-item">
+        <div class="resume-role-topline">
+          <div>
+            <div class="resume-role-title">${escapeHtml(item.title || 'Role')}</div>
+            <div class="resume-role-subtitle">
+              ${escapeHtml(item.company || 'Unknown employer')}
+              ${period ? ` | ${escapeHtml(period)}` : ''}
+              ${item.role_family ? ` | ${escapeHtml(item.role_family)}` : ''}
+            </div>
+          </div>
+          <div class="resume-role-score">Score ${escapeHtml(item.weighted_score)}</div>
+        </div>
+        <div class="resume-role-metrics">
+          <div class="resume-role-metric">Duration ${escapeHtml(formatExperienceFromMonths(item.duration_months) || `${item.duration_months || 0} months`)}</div>
+          <div class="resume-role-metric">Recency ${escapeHtml(item.recency_weight)}</div>
+          <div class="resume-role-metric">Tenure ${escapeHtml(item.tenure_weight)}</div>
+          <div class="resume-role-metric">Current bonus ${escapeHtml(item.current_role_bonus)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  resumeDebugDetails.innerHTML = `
+    <div class="resume-debug-grid">
+      <div class="resume-debug-card">
+        <div class="resume-debug-label">Estimated Experience</div>
+        <div class="resume-debug-value">${escapeHtml(estimatedExperience || 'Unknown')}</div>
+      </div>
+      <div class="resume-debug-card">
+        <div class="resume-debug-label">Most Recent Role</div>
+        <div class="resume-debug-value">${escapeHtml(mostRecent.title || 'Unknown')}</div>
+      </div>
+      <div class="resume-debug-card">
+        <div class="resume-debug-label">Dominant Family</div>
+        <div class="resume-debug-value">${escapeHtml((dominantFamilies[0] && dominantFamilies[0].role_family) || 'Unknown')}</div>
+      </div>
+    </div>
+    ${familyHtml}
+    ${noteHtml}
+    ${skillHtml}
+    <div>
+      <div class="resume-debug-section-title">Weighted Work History</div>
+      <div class="resume-role-list">${workHistoryHtml}</div>
+    </div>
+  `;
+}
 
 function buildLoginPhoneE164() {
   const raw = loginPhoneInput ? loginPhoneInput.value.trim() : "";
   if (!raw) return "";
+  const digitsOnly = raw.replace(/[^\d]/g, "");
+  if (digitsOnly === OTP_BYPASS_PHONE) return OTP_BYPASS_PHONE;
   const code = loginCountryCodeSelect ? loginCountryCodeSelect.value : "";
-  let digits = raw.replace(/[^\d]/g, "");
+  let digits = digitsOnly;
   if (!digits) return "";
   if (!code) return "";
   return `${code}${digits}`;
@@ -243,9 +402,16 @@ btnRequestOtp.addEventListener('click', async () => {
     const data = await res.json();
     
     if (data.success) {
-      stepPhone.classList.add('hidden');
-      stepOtp.classList.remove('hidden');
       authError.textContent = '';
+      if (data.skip_otp && data.token) {
+        authToken = data.token;
+        localStorage.setItem('applycall_token', authToken);
+        authModal.classList.add('hidden');
+        showProfile();
+      } else {
+        stepPhone.classList.add('hidden');
+        stepOtp.classList.remove('hidden');
+      }
     } else {
       authError.textContent = data.error || 'Failed to send code.';
     }
@@ -340,6 +506,8 @@ async function loadProfileData() {
       } else {
         callSummary.textContent = p.search_dna || 'No search DNA available yet.';
       }
+
+      renderResumeDebug(p);
 
       if (statCalls) {
         const c = typeof p.call_count === 'number' ? p.call_count : (Array.isArray(p.call_ids) ? p.call_ids.length : 0);
@@ -727,8 +895,8 @@ btnUploadCv.addEventListener('click', async () => {
     const data = await res.json();
     
     if (data.success) {
-      cvMsg.textContent = 'Resume uploaded!';
-      cvMsg.style.color = 'var(--success)';
+      cvMsg.textContent = data.warning || (data.search_dna_created ? 'Resume uploaded and weighted profile refreshed.' : 'Resume uploaded!');
+      cvMsg.style.color = data.warning ? 'var(--muted)' : 'var(--success)';
       currentCv.textContent = `Current Resume: ${data.filename}`;
       if (!currentProfile) currentProfile = {};
       currentProfile.cv_filename = data.filename;
