@@ -391,7 +391,7 @@ btnRequestOtp.addEventListener('click', async () => {
   }
   
   btnRequestOtp.disabled = true;
-  btnRequestOtp.textContent = 'Sending...';
+  btnRequestOtp.textContent = 'Logging in...';
   
   try {
     const res = await fetch(`${API_BASE}/api/auth/otp`, {
@@ -413,14 +413,14 @@ btnRequestOtp.addEventListener('click', async () => {
         stepOtp.classList.remove('hidden');
       }
     } else {
-      authError.textContent = data.error || 'Failed to send code.';
+      authError.textContent = data.error || 'Login failed.';
     }
   } catch (err) {
     authError.textContent = 'Network error. Check console.';
     console.error(err);
   } finally {
     btnRequestOtp.disabled = false;
-    btnRequestOtp.textContent = 'Send Code';
+    btnRequestOtp.textContent = 'Login';
   }
 });
 
@@ -466,6 +466,10 @@ btnVerifyOtp.addEventListener('click', async () => {
     btnVerifyOtp.textContent = 'Verify & Login';
   }
 });
+
+if (stepOtp) {
+  stepOtp.classList.add('hidden');
+}
 
 async function loadProfileData() {
   if (!authToken) return;
@@ -960,6 +964,15 @@ function renderRecommendedJobs() {
          <div style="font-weight: 700; color: var(--brand-2); margin-bottom: 4px;">Why you match:</div>
          <div style="font-style: italic; color: #fff;">${job.match_justification}</div>
        </div>` : '';
+    const minimumCriteriaToConfirm = Array.isArray(job.minimum_criteria_to_confirm)
+      ? job.minimum_criteria_to_confirm.filter(item => String(item || '').trim())
+      : [];
+    const minimumCriteriaNote = minimumCriteriaToConfirm.length
+      ? `<div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+           <div style="font-weight: 700; color: #f7c873; margin-bottom: 4px;">Minimum criteria to confirm:</div>
+           <div style="color: #fff;">${minimumCriteriaToConfirm.join('; ')}</div>
+         </div>`
+      : '';
 
     const applyDisabled = !hasCvForApply;
     const applyLabel = applyDisabled ? 'Upload a resume to apply' : 'Apply Online';
@@ -987,6 +1000,7 @@ function renderRecommendedJobs() {
          <button id="job-btn-${job.id}" class="button secondary small" style="width: 100%;" onclick="toggleJobDesc('${job.id}')">Show Description</button>
          <div id="job-desc-${job.id}" class="job-description hidden" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
             ${justification}
+            ${minimumCriteriaNote}
             ${description}
          </div>
       </div>
