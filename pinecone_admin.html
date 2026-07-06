@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>ApplyCall Pinecone Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="bg"></div>
+    <main class="page page-wide">
+      <header class="header-top">
+        <div class="logo">ApplyCall</div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a class="button secondary small" href="/">Main App</a>
+        </div>
+      </header>
+
+      <section class="admin-shell">
+        <div class="panel">
+          <div class="admin-header-row">
+            <div>
+              <h1 class="title admin-title">Pinecone Job Search</h1>
+              <p class="subtitle admin-subtitle">Edit metadata filters, run a basic Pinecone search, preview matches, and export the current result set.</p>
+            </div>
+          </div>
+
+          <div class="admin-grid">
+            <div class="field-group admin-grid-span-2">
+              <label class="label" for="admin-search-text">Search text</label>
+              <textarea id="admin-search-text" class="admin-textarea" placeholder="RN med surg, speech therapist inpatient pediatrics, warehouse supervisor night shift"></textarea>
+            </div>
+
+            <div class="field-group">
+              <label class="label" for="admin-top-k">Results limit</label>
+              <input id="admin-top-k" type="number" min="1" max="500" value="100" />
+            </div>
+
+            <div class="field-group">
+              <label class="label" for="admin-match-mode">Filter mode</label>
+              <select id="admin-match-mode" class="select">
+                <option value="all">Match all filters</option>
+                <option value="any">Match any filter</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-actions">
+            <button id="admin-run-search" class="button">Run Search</button>
+            <button id="admin-export-json" class="button secondary">Export JSON</button>
+            <button id="admin-export-csv" class="button secondary">Export CSV</button>
+          </div>
+
+          <div id="admin-status" class="form-note"></div>
+        </div>
+
+        <div class="panel">
+          <div class="admin-section-header">
+            <h3 class="panel-title" style="margin: 0;">Metadata Filters</h3>
+            <button id="admin-add-filter" class="button secondary small" type="button">Add Filter</button>
+          </div>
+          <div id="admin-filter-list" class="admin-filter-list"></div>
+          <div class="info-box admin-note-box">
+            <div id="admin-notes"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="admin-section-header">
+            <h3 class="panel-title" style="margin: 0;">Results</h3>
+            <div id="admin-results-summary" class="tag">No search run yet.</div>
+          </div>
+          <div id="admin-results" class="admin-results"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="pinecone_admin.js"></script>
+  </body>
+</html>
