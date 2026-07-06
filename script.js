@@ -624,7 +624,11 @@ async function loadRecommendedJobs() {
     const data = await res.json();
     
     if (data.success) {
-      profileRecommendedJobs = data.recommendations || [];
+      profileRecommendedJobs = (data.recommendations || []).slice().sort((a, b) => {
+        const aScore = Number(a && a.match_score) || 0;
+        const bScore = Number(b && b.match_score) || 0;
+        return bScore - aScore;
+      });
       hasCvForApply = !!data.has_cv;
       showingAllJobs = false;
       renderRecommendedJobs();
